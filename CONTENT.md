@@ -277,10 +277,16 @@ All safe to re-run; each prints what it changed and is a no-op when there is
 nothing to do.
 
 ```bash
-python3 scripts/build-content.py --lazy-images   # add loading="lazy" to body images
-python3 scripts/build-content.py --fix-links     # repair /slug/ links to the dated URL
-python3 scripts/build-content.py --fix-media     # repair featuredImage paths
+python3 scripts/optimize-images.py --write   # regenerate WebP siblings, cap oversized files
+python3 scripts/derive-alt-text.py --write   # fill empty image alt text from surrounding copy
+python3 scripts/build-content.py --fix-links # repair /slug/ links to the dated URL
+python3 scripts/build-content.py --fix-media # repair featuredImage paths
+python3 scripts/build-content.py --lazy-images
 ```
+
+Run `optimize-images.py` after adding images by hand. Images uploaded through
+the admin are not converted automatically — run it, or just leave them: a
+single modern screenshot is not the problem, 47 MB of them was.
 
 `--fix-links` exists because the WordPress import rewrote
 `https://help.beat22.com/<slug>/` to `/<slug>/`, but the real permalink is

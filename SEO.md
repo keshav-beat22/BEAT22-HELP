@@ -83,11 +83,19 @@ Validate with the [Rich Results Test](https://search.google.com/test/rich-result
 Core Web Vitals are a ranking input, and this is a static site, so most of it
 comes free. What was done deliberately:
 
+- **Images are served as WebP.** The WordPress export was 47 MB of 24-bit PNG
+  screenshots — one was 2.6 MB on its own — and body images never pass through
+  next/image because article HTML is injected directly. Every raster image now
+  has a WebP sibling (47 MB → 3.4 MB, 93% smaller; the worst offender went
+  2.6 MB → 112 KB) and the renderer emits a `<picture>` so older browsers still
+  get the original. Regenerate with
+  `python3 scripts/optimize-images.py --write`.
 - **No web fonts.** System font stack — zero font requests, no FOUT.
-- **Body images are lazy** with `loading="lazy" decoding="async"`, applied at
-  import time by `scripts/build-content.py`.
-- **Images carry `width`/`height`** so nothing reflows as they load.
-- **Payment marks are fixed-box with `object-fit: contain`**, so the footer
+- **Body images are lazy**, with `loading="lazy" decoding="async"`.
+- **Images carry real width and height**, read off disk at build time, because
+  Markdown syntax cannot express them and without them the page reflows as each
+  image loads.
+- **Payment marks are a fixed box with `object-fit: contain`**, so the footer
   never shifts when they load.
 - **The Visa and UPI marks were 183 KB and 21 KB** — SVGs wrapping oversized
   embedded rasters. Downscaled to 10 KB and 13 KB.
@@ -96,7 +104,8 @@ comes free. What was done deliberately:
   megabyte of third-party JavaScript per page view; the placeholder costs one
   thumbnail and loads the player only when asked.
 
----
+Measured on the production build: an article page is roughly 12 KB of
+compressed HTML, 102 KB of shared JavaScript, and its images.
 
 ## Internal linking
 
@@ -117,10 +126,13 @@ Crawl depth and topical clustering, both of which matter for a help centre:
    `https://help.beat22.com/sitemap.xml` on the day of cutover. Watch Coverage
    and Redirects for two weeks. Do the same in Bing Webmaster Tools.
 
-2. **Image alt text.** Most article images came out of WordPress with
-   `alt=""`. They are valid but invisible to image search and to screen
-   readers. Filling these in is the single highest-value content task left.
+2. **Read the derived alt text.** All 125 body images now have alt text, taken
+   from the instruction each screenshot sits under —
+   `python3 scripts/derive-alt-text.py`. It is a large improvement on 125 empty
+   alts, and most of it reads correctly ("Click on Browse at the top"), but it
+   is derived rather than authored. Worth a pass in the admin on the
+   highest-traffic articles.
 
-3. **Descriptions are auto-derived for some articles.** All 43 have one under
-   160 characters, but the ones taken from the first sentence of the body read
-   like body copy, not like a search snippet. Worth a pass.
+3. **Meta descriptions.** All 43 are present and under 160 characters, but the
+   ones taken from the first sentence of the body read like body copy rather
+   than a search snippet. Worth rewriting the top ten.

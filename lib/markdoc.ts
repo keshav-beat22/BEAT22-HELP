@@ -7,6 +7,32 @@ const PUBLIC_DIR = path.join(process.cwd(), 'public');
 
 /** Measured once per file per build; the content set is static. */
 const dimensionCache = new Map<string, { width: number; height: number } | null>();
+const webpCache = new Map<string, string | null>();
+
+/**
+ * The WebP sibling written by scripts/optimize-images.py, if there is one.
+ *
+ * Body images are injected as HTML and never pass through next/image, so the
+ * file on disk is exactly what ships. The WordPress export is 24-bit PNG
+ * screenshots — 47 MB in total, against 3.4 MB as WebP — which is the heaviest
+ * thing on an article page and lands directly on Largest Contentful Paint.
+ */
+function webpSibling(src: string): string | null {
+  if (webpCache.has(src)) return webpCache.get(src) ?? null;
+
+  let result: string | null = null;
+  if (/\.(png|jpe?g)$/i.test(src) && src.startsWith('/') && !src.startsWith('//')) {
+    const candidate = src.replace(/\.(png|jpe?g)$/i, '.webp');
+    try {
+      const file = path.join(PUBLIC_DIR, decodeURIComponent(candidate));
+      if (file.startsWith(PUBLIC_DIR) && fs.existsSync(file)) result = candidate;
+    } catch {
+      // Unreadable path: fall back to the original.
+    }
+  }
+  webpCache.set(src, result);
+  return result;
+}
 
 /**
  * Real pixel dimensions for a local image.
@@ -63,15 +89,27 @@ const config: Config = {
         const attrs = node.transformAttributes(cfg);
         const src = String(attrs.src ?? '');
         const size = measure(src);
-        return new Markdoc.Tag('img', {
+        const webp = webpSibling(src);
+
+        const img = new Markdoc.Tag('img', {
           ...attrs,
           alt: attrs.alt ?? '',
           loading: 'lazy',
           decoding: 'async',
           ...(size ? { width: size.width, height: size.height } : {}),
         });
+
+        if (!webp) return img;
+
+        // <picture> lets a modern browser take the WebP while anything older
+        // still gets the original, with no change to the content reference.
+        return new Markdoc.Tag('picture', {}, [
+          new Markdoc.Tag('source', { srcset: webp, type: 'image/webp' }),
+          img,
+        ]);
       },
     },
+
     // Headings inside an article body start at <h3>: <h1> is the article
     // title and <h2> belongs to the page furniture.
     heading: {
