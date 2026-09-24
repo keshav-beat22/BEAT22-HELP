@@ -66,5 +66,12 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: '/:path*',
+  /**
+   * Everything except framework internals, media and files with an extension.
+   *
+   * Scoped deliberately: Edge Middleware invocations are metered on Vercel,
+   * and matching '/:path*' would spend one on every image, script and
+   * stylesheet as well as every page.
+   */
+  matcher: ['/((?!_next/static|_next/image|images/|favicon.ico|.*\\.[\\w]+$).*)'],
 };

@@ -291,3 +291,25 @@ single modern screenshot is not the problem, 47 MB of them was.
 `--fix-links` exists because the WordPress import rewrote
 `https://help.beat22.com/<slug>/` to `/<slug>/`, but the real permalink is
 `/YYYY/MM/DD/<slug>/`. Six article cross-links were 404ing because of it.
+
+---
+
+## Does adding articles slow the site down?
+
+No. This was measured by building and serving the site with 500 articles:
+build time went 32 s to 36 s, and the home page, article pages, `/search/` and
+the audience pages were byte-for-byte the same size. Pages are prerendered and
+served from the CDN, so there is no per-request work that can get slower.
+
+Two things to keep an eye on as the library grows:
+
+1. **Category pages list every article in the category.** At ~168 articles a
+   category page is 17 KB — fast, but a lot of scrolling. Past roughly 150
+   articles in one category, splitting it or adding pagination is worth doing
+   for readability.
+2. **Images you upload in the admin are not converted to WebP automatically.**
+   One modern screenshot is not a problem; a habit of uploading 3 MB PNGs is.
+   Run `python3 scripts/optimize-images.py --write` occasionally, or before a
+   big batch goes live.
+
+See the measured table in [SEO.md](SEO.md#scaling-what-adding-content-costs).

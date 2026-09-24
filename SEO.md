@@ -107,6 +107,51 @@ comes free. What was done deliberately:
 Measured on the production build: an article page is roughly 12 KB of
 compressed HTML, 102 KB of shared JavaScript, and its images.
 
+## Scaling: what adding content costs
+
+Measured, not estimated — built and served with 500 articles to check.
+
+| | 43 articles | 500 articles |
+|---|---|---|
+| Build time | 32 s | 36 s |
+| Home page | 9.4 KB | 9.4 KB |
+| Article page | 11.4 KB | 11.4 KB |
+| `/search/` page | 8.0 KB | 8.0 KB |
+| `/buyers/` | 9.9 KB | 9.9 KB |
+| Busiest category page | 6 KB | 17.2 KB (168 articles) |
+
+(compressed transfer, excluding images)
+
+Build time is dominated by compilation, not page count, so it stays flat.
+Pages are prerendered at build and served from the CDN — there is no
+per-request work to get slower.
+
+**The one thing that used to scale badly was search.** The index was inlined
+into `/search/`, so every visitor downloaded the whole corpus before typing:
+35 KB at 43 articles, and growing linearly. It is now a separate prerendered
+asset at `/search-index.json`, fetched once and cached, so the page is a
+constant 8 KB however many articles exist.
+
+**Category pages are the only thing that still grows**, because they list
+every article in the category. At 168 articles that is 17 KB — fast, but a lot
+of scrolling. If a single category ever passes roughly 150 articles, the fix is
+pagination for readability, not for speed.
+
+### Vercel free tier
+
+Nothing here approaches a limit:
+
+- **Image optimization: zero used.** Every `next/image` call is `unoptimized`
+  and body images are plain `<img>`, so none of the 1,000/month transforms are
+  consumed.
+- **Edge middleware** is scoped to exclude `/_next`, `/images` and anything
+  with a file extension, so it runs on page requests only rather than on every
+  asset.
+- **Everything is static.** No serverless function runs to serve a page,
+  including `/search-index.json` and `/sitemap.xml`.
+- **Bandwidth**: roughly 150-400 KB per page view including images, against
+  100 GB/month.
+
 ## Internal linking
 
 Crawl depth and topical clustering, both of which matter for a help centre:

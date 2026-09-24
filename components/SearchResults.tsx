@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useMemo } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
@@ -32,12 +32,33 @@ function score(entry: IndexEntry, terms: string[]): number {
   return total;
 }
 
-function Results({ index }: { index: IndexEntry[] }) {
+function Results() {
   const params = useSearchParams();
   const query = (params.get('q') ?? '').trim();
   const category = params.get('category');
 
+  const [index, setIndex] = useState<IndexEntry[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  // Fetched rather than inlined: the page ships the same bytes whether there
+  // are 43 articles or 4,300, and the CDN serves the index from cache.
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/search-index.json')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((data: IndexEntry[]) => {
+        if (!cancelled) setIndex(data);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const matches = useMemo(() => {
+    if (!index) return [];
     const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
     let pool = index;
     if (category) {
@@ -51,6 +72,19 @@ function Results({ index }: { index: IndexEntry[] }) {
       .sort((a, b) => b.s - a.s)
       .map((r) => r.entry);
   }, [index, query, category]);
+
+  if (failed) {
+    return (
+      <p className="empty-state">
+        Search is unavailable right now. Browse the categories on the{' '}
+        <Link href="/">home page</Link>.
+      </p>
+    );
+  }
+
+  if (!index) {
+    return <p className="empty-state">Loading search…</p>;
+  }
 
   if (!query && !category) {
     return (
@@ -90,10 +124,10 @@ function Results({ index }: { index: IndexEntry[] }) {
   );
 }
 
-export default function SearchResults({ index }: { index: IndexEntry[] }) {
+export default function SearchResults() {
   return (
     <Suspense fallback={<p className="empty-state">Loading…</p>}>
-      <Results index={index} />
+      <Results />
     </Suspense>
   );
 }

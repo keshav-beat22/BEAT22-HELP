@@ -504,7 +504,23 @@ img {
 }
 
 /* Tighter run-in to the content below. */
-.full-width-banner.compact + .breadcrumbs {
+.full-width-banner.compact + .error-retry {
+  background-image: var(--gradient-cta);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+.error-retry:hover {
+  filter: brightness(1.12);
+}
+
+.breadcrumbs {
   margin-top: 16px;
 }
 
