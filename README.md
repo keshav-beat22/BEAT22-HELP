@@ -34,8 +34,7 @@ keystatic.config  what the admin shows and where it writes
 |---|---|
 | Add or edit an article, embed a video, upload an image | [CONTENT.md](CONTENT.md) |
 | Change footer links, logo, CTA | `lib/site.ts` — content only, no components |
-| Go live, step by step | [GO-LIVE.md](GO-LIVE.md) |
-| Understand the hosting choice | [DEPLOYMENT.md](DEPLOYMENT.md) |
+| Go live, and the hosting choice | [GO-LIVE.md](GO-LIVE.md) |
 | Understand the SEO setup | [SEO.md](SEO.md) |
 | Understand how the admin is secured | [SECURITY.md](SECURITY.md) |
 

@@ -47,7 +47,9 @@ export default config({
       path: 'content/posts/*',
       format: { contentField: 'content' },
       entryLayout: 'content',
-      columns: ['title', 'date'],
+      // The slugField renders its own column automatically; listing it again
+      // produced an empty "Title". Only the extra columns belong here.
+      columns: ['date'],
 
       schema: {
         title: fields.slug({
@@ -78,18 +80,18 @@ export default config({
           validation: { isRequired: true, length: { max: 160 } },
         }),
 
-        date: fields.date({
+        date: fields.datetime({
           label: 'Publish date',
           description: 'Also forms the article URL, so set it before saving.',
-          defaultValue: { kind: 'today' },
+          defaultValue: { kind: 'now' },
           validation: { isRequired: true },
         }),
 
-        modified: fields.date({
+        modified: fields.datetime({
           label: 'Last updated',
           description:
             'Bump after a meaningful edit — it tells search engines to recrawl.',
-          defaultValue: { kind: 'today' },
+          defaultValue: { kind: 'now' },
         }),
 
         // Reads the categories collection, so adding a category there makes it
@@ -199,7 +201,6 @@ export default config({
       slugField: 'name',
       path: 'content/categories/*',
       format: 'yaml',
-      columns: ['name'],
       schema: {
         name: fields.slug({
           name: {

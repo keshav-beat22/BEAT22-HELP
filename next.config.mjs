@@ -61,6 +61,16 @@ const nextConfig = {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
+          {
+            // Deliberately narrow. A script-src directive would need nonces
+            // for the inline scripts Next emits, and getting that wrong breaks
+            // the whole page; these three are unambiguous and cost nothing.
+            //   frame-ancestors  clickjacking, and supersedes X-Frame-Options
+            //   object-src       kills <object>/<embed> plugin vectors
+            //   base-uri         stops an injected <base> retargeting links
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'",
+          },
         ],
       },
       {

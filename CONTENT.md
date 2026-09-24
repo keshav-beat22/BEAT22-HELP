@@ -277,6 +277,7 @@ All safe to re-run; each prints what it changed and is a no-op when there is
 nothing to do.
 
 ```bash
+node   scripts/normalise-dates.mjs --write   # dates to the ISO form the editor accepts
 python3 scripts/optimize-images.py --write   # regenerate WebP siblings, cap oversized files
 python3 scripts/derive-alt-text.py --write   # fill empty image alt text from surrounding copy
 python3 scripts/build-content.py --fix-links # repair /slug/ links to the dated URL

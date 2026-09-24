@@ -168,3 +168,75 @@ stack — the overlay catches it and shows it as though it were your error. It
 is not, and the overlay does not exist in the production build, so it never
 appears on the deployed site. To silence it locally, disable the extension for
 localhost or use an Incognito window.
+
+---
+
+## Recommendation: Vercel
+
+For this site, Vercel is the right choice. AWS is the better choice for some
+projects — this is not one of them, and here is the honest reasoning rather
+than a blanket preference.
+
+### Why Vercel fits this project
+
+**It is a 43-page static content site.** Every page is prerendered at build
+time. There is no server logic, no database, no authentication. This is the
+exact workload Vercel's free tier is built around, and you will likely never
+pay anything.
+
+**Next.js features work without configuration.** Vercel builds Next.js, so
+image optimisation, the App Router, `sitemap.ts`, `robots.ts`, and the
+redirects in `next.config.mjs` all work on push with no adapter or plugin. On
+AWS you configure each of these yourself.
+
+**Push-to-deploy from GitHub.** Connect the repo once. Every push to `main`
+goes live; every pull request gets its own preview URL. For a help centre
+edited by non-developers, the preview URL is genuinely useful — someone can
+check a new article before it publishes.
+
+**Rollback is one click.** Given you are migrating away from a site that kept
+breaking, being able to revert to the previous deployment instantly is worth
+something real.
+
+### Where AWS would win, and why it does not apply here
+
+| AWS is better when… | Your situation |
+|---|---|
+| You need VPC, RDS, or private networking | No backend at all |
+| You run heavy server-side compute | Everything is static |
+| You are already committed to AWS and want one bill | You are starting fresh |
+| You need fine-grained control over caching and WAF | CDN defaults are fine for 43 pages |
+| Egress costs at very high traffic | A help centre's traffic is modest |
+
+If you later decide you want AWS, the path is **AWS Amplify Hosting**, which
+supports Next.js SSR, rather than raw S3 and CloudFront. Plain S3 static
+hosting would mean giving up image optimisation and the redirect handling.
+
+Nothing here locks you in. The project is standard Next.js — moving to Amplify,
+Netlify, Cloudflare Pages, or a container later is a configuration change, not
+a rewrite.
+
+---
+
+---
+
+## Security notes
+
+- There is no database and no PHP. The public site is prerendered HTML.
+- `/admin` and `/keystatic` are `noindex` and carry no site chrome.
+- Publishing goes through GitHub, so every change is attributable and
+  revertable, and removing someone's repo access removes their ability to
+  publish.
+- Security headers (`X-Content-Type-Options`, `X-Frame-Options`,
+  `Referrer-Policy`, `Permissions-Policy`) are set in `next.config.mjs`.
+
+---
+
+## Known advisory
+
+`npm audit` reports a `postcss` advisory. It comes from **Next.js 15's own
+pinned dependency**, not from anything added here, and the only "fix" npm
+offers is a major upgrade to Next 16. Every one of those advisories requires
+processing attacker-controlled CSS at build time; the only CSS this project
+compiles is `app/globals.css`, which is first-party. There is no runtime
+exposure. Revisit when upgrading to Next 16 deliberately.
