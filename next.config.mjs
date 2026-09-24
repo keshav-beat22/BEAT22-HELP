@@ -17,6 +17,11 @@ const nextConfig = {
   // the old site instead of 308-redirecting to a slashless variant.
   trailingSlash: true,
 
+  // Next's own trailing-slash redirect would append a slash to the Keystatic
+  // admin routes, which its client router cannot match. middleware.ts applies
+  // the rule per path instead: slash for the public site, none for the admin.
+  skipTrailingSlashRedirect: true,
+
   reactStrictMode: true,
   poweredByHeader: false,
 

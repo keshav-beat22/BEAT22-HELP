@@ -18,22 +18,50 @@ redeploys automatically.
 Locally, `npm run cms` gives you the same editor at
 `http://localhost:3000/admin` writing straight to your working copy.
 
-### What the admin can and cannot do
+### What the editor gives you
 
-| | |
-|---|---|
-| Create new articles | Yes |
-| Edit articles created in the admin | Yes |
-| Upload images | Yes — they land in `public/images/uploads/` |
-| Edit the 43 articles migrated from WordPress | **No** — see below |
-| Create new *pages* (like `/buyers/`) | **No** — pages are code |
+A block editor, similar to Notion or the WordPress block editor.
 
-The 43 migrated articles are `.md` files whose bodies are the original
-WordPress HTML, preserved byte-for-byte so the migration could be verified.
-The admin writes `.mdoc` files with Markdown bodies. Both render identically
-on the site, but the editor only lists the format it owns. To edit a migrated
-article, edit the file (option 2). Converting them to the admin's format is
-possible — ask, and it can be done as a separate, verified change.
+**Formatting** — bold, italic, strikethrough, inline code, three heading
+levels, bullet and numbered lists, quotes, dividers, code blocks and tables.
+The toolbar runs along the top; "/" and the "+" button insert blocks.
+
+**Reordering** — every block (paragraph, heading, list, image, video) can be
+cut and pasted, or dragged, to move it up or down. That is how you reposition
+an image or a video relative to the text around it.
+
+**Images** — the Image button in the toolbar uploads a file, which is
+committed alongside the article.
+
+**YouTube** — see [Embedding a YouTube video](#embedding-a-youtube-video). Paste
+any YouTube link and it is detected automatically.
+
+**Side panel** — title, URL slug, search description, publish date, last
+updated, categories, audience, social share image and reading time.
+
+**Categories** — managed under Content → Categories. Add one there and it
+appears immediately in the category picker on every article. No code change.
+
+**History** — every save is a git commit, so any version can be restored.
+
+### One known rough edge
+
+Images that were already in the 43 migrated articles show in the editor as
+their Markdown text — `![](/images/2025/09/screenshot.png)` — rather than as a
+picture. They render perfectly on the live site, and the line can still be
+moved, cut or deleted like any other block, so repositioning works. It is a
+display limitation in the editor's handling of pre-existing Markdown images,
+not a content problem: opening an article and saving it again reproduces the
+file byte for byte.
+
+Images you insert with the toolbar behave normally.
+
+### What the admin cannot do
+
+**Create new pages.** Pages like `/buyers/` and `/sellers/` are React
+components with their own layout and structured data — they are code, not
+content. Adding one is a developer task (see [Add a page](#add-a-page)).
+Articles, which is what almost all new content is, are fully covered.
 
 ### First-time setup
 

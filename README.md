@@ -21,7 +21,7 @@ app/              routes (App Router), globals.css, sitemap, robots, manifest
   keystatic/      admin UI  ->  /keystatic  (aliased as /admin)
   api/keystatic/  admin's GitHub auth + save endpoints
 components/       Header, Footer, Hero, SearchBar, ArticleList, …
-content/          posts/*.md + *.mdoc (articles), categories.json, redirects.json
+content/          posts/*.mdoc (articles), categories/*.yaml, redirects.json
 lib/              site.ts (constants), posts.ts (queries), seo.ts (metadata + schema)
 public/images/    brand/ (logo, payment marks, OG card), uploads/ (from the admin)
 scripts/          new-article.py (scaffold), build-content.py (import + repairs)
@@ -36,6 +36,7 @@ keystatic.config  what the admin shows and where it writes
 | Change footer links, logo, CTA | `lib/site.ts` — content only, no components |
 | Deploy, or point the domain | [DEPLOYMENT.md](DEPLOYMENT.md) |
 | Understand the SEO setup | [SEO.md](SEO.md) |
+| Understand how the admin is secured | [SECURITY.md](SECURITY.md) |
 
 ## Rules that must not change
 

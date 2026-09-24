@@ -1,10 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
-import { marked } from 'marked';
-import categoriesData from '@/content/categories.json';
+import { renderMarkdoc } from './markdoc';
+import { load as loadYaml } from 'js-yaml';
 
 const POSTS_DIR = path.join(process.cwd(), 'content', 'posts');
+const CATEGORIES_DIR = path.join(process.cwd(), 'content', 'categories');
 
 export interface Post {
   title: string;
@@ -41,18 +42,16 @@ let categoryCache: Category[] | null = null;
 /**
  * Two body formats coexist, deliberately:
  *
- *  .md    the 43 articles migrated from WordPress. The body is raw HTML and
- *         is passed through untouched, so the migration stays byte-exact.
- *  .mdoc  anything written in the Keystatic admin. The body is Markdown and
- *         is rendered to HTML here, at build time.
- *
- * Keeping them apart by extension means the CMS cannot alter how an existing
- * article renders.
+ *  .mdoc  Markdown body, rendered to HTML at build time. Everything uses this
+ *         now, including the articles migrated from WordPress — the admin can
+ *         only edit what it can parse.
+ *  .md    raw HTML body, passed through untouched. Nothing ships in this form
+ *         any more, but the branch stays so a hand-written HTML article keeps
+ *         working if one is ever added.
  */
 function renderBody(file: string, raw: string): string {
   if (!file.endsWith('.mdoc')) return raw.trim();
-  // `async: false` keeps this synchronous; every call site is build-time.
-  return marked.parse(raw.trim(), { async: false, gfm: true, breaks: false });
+  return renderMarkdoc(raw.trim());
 }
 
 /**
@@ -72,12 +71,29 @@ function toDateString(value: unknown): string {
 }
 
 /**
- * The admin collects category slugs only, so resolve the display names from
- * the JSON directly. Deliberately not via getCategories(), which reads posts
- * to count them and would recurse.
+ * Categories, read from content/categories/*.yaml — the same files the admin
+ * edits, so adding a category there needs no code change. Names are resolved
+ * here rather than via getCategories(), which counts posts and would recurse.
  */
+function readCategoryFiles(): Omit<Category, 'count'>[] {
+  if (!fs.existsSync(CATEGORIES_DIR)) return [];
+  return fs
+    .readdirSync(CATEGORIES_DIR)
+    .filter((f) => f.endsWith('.yaml') || f.endsWith('.yml'))
+    .map((file) => {
+      const raw = fs.readFileSync(path.join(CATEGORIES_DIR, file), 'utf8');
+      const data = (loadYaml(raw) ?? {}) as { name?: string; description?: string };
+      return {
+        slug: file.replace(/\.ya?ml$/, ''),
+        name: data.name ?? '',
+        description: data.description ?? '',
+      };
+    })
+    .filter((c) => c.name);
+}
+
 function namesForSlugs(slugs: string[]): string[] {
-  const all = categoriesData as Category[];
+  const all = readCategoryFiles();
   return slugs
     .map((slug) => all.find((c) => c.slug === slug)?.name)
     .filter((n): n is string => Boolean(n));
@@ -191,14 +207,13 @@ export function getAdjacentPosts(slug: string): {
 }
 
 /**
- * Categories, with `count` recomputed from the files in content/posts rather
- * than trusted from categories.json.
+ * Categories with their live article counts.
  *
- * The JSON counts were a snapshot of the WordPress export and went stale the
- * moment an article was added or removed. Since generateStaticParams only
- * builds categories with count > 0, a stale zero meant a new article's
- * category page silently failed to exist. Deriving the number here means
- * dropping a file into content/posts is all that is ever required.
+ * `count` is derived from the files in content/posts, never stored. The old
+ * categories.json carried a snapshot of the WordPress export that went stale
+ * the moment an article moved, and since generateStaticParams only builds
+ * categories with count > 0, a stale zero meant a category page silently
+ * failed to exist.
  */
 export function getCategories(): Category[] {
   if (categoryCache) return categoryCache;
@@ -210,7 +225,7 @@ export function getCategories(): Category[] {
     }
   }
 
-  categoryCache = (categoriesData as Category[]).map((c) => ({
+  categoryCache = readCategoryFiles().map((c) => ({
     ...c,
     count: counts.get(c.slug) ?? 0,
   }));
