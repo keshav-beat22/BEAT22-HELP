@@ -1,0 +1,74 @@
+[
+  {
+    "slug": "buyer",
+    "name": "Buyer",
+    "description": "",
+    "count": 0
+  },
+  {
+    "slug": "licensing-content-for-buyers",
+    "name": "Licensing Content for Buyers",
+    "description": "Know your beat license rights",
+    "count": 1
+  },
+  {
+    "slug": "post-purchase-orders",
+    "name": "Post Purchase & Orders",
+    "description": "Manage orders and downloads",
+    "count": 3
+  },
+  {
+    "slug": "profile-related-faqs",
+    "name": "Profile Related FAQs",
+    "description": "Update profile and settings",
+    "count": 3
+  },
+  {
+    "slug": "purchasing-pricing",
+    "name": "Purchasing & Pricing",
+    "description": "Buy beats and apply coupons",
+    "count": 5
+  },
+  {
+    "slug": "seller",
+    "name": "Seller",
+    "description": "",
+    "count": 4
+  },
+  {
+    "slug": "studio-faqs",
+    "name": "Studio FAQs",
+    "description": "Seller account and studio help",
+    "count": 6
+  },
+  {
+    "slug": "troubleshooting",
+    "name": "Troubleshooting",
+    "description": "Fix issues and errors",
+    "count": 1
+  },
+  {
+    "slug": "uncategorized",
+    "name": "Uncategorized",
+    "description": "",
+    "count": 0
+  },
+  {
+    "slug": "content-management-2",
+    "name": "Content Management",
+    "description": "Manage beats, tags, and artwork",
+    "count": 8
+  },
+  {
+    "slug": "licensing-content",
+    "name": "Licensing Content",
+    "description": "Understand licenses and usage rights",
+    "count": 8
+  },
+  {
+    "slug": "sales-earnings",
+    "name": "Sales & Earnings",
+    "description": "Track sales and earnings info",
+    "count": 8
+  }
+]
