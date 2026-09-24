@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import matter from 'gray-matter';
+import { marked } from 'marked';
 import categoriesData from '@/content/categories.json';
 
 const POSTS_DIR = path.join(process.cwd(), 'content', 'posts');
@@ -37,33 +38,97 @@ export interface Category {
 let cache: Post[] | null = null;
 let categoryCache: Category[] | null = null;
 
+/**
+ * Two body formats coexist, deliberately:
+ *
+ *  .md    the 43 articles migrated from WordPress. The body is raw HTML and
+ *         is passed through untouched, so the migration stays byte-exact.
+ *  .mdoc  anything written in the Keystatic admin. The body is Markdown and
+ *         is rendered to HTML here, at build time.
+ *
+ * Keeping them apart by extension means the CMS cannot alter how an existing
+ * article renders.
+ */
+function renderBody(file: string, raw: string): string {
+  if (!file.endsWith('.mdoc')) return raw.trim();
+  // `async: false` keeps this synchronous; every call site is build-time.
+  return marked.parse(raw.trim(), { async: false, gfm: true, breaks: false });
+}
+
+/**
+ * YAML parses an unquoted `2026-09-24` into a Date, not a string, so anything
+ * the admin writes arrives as a Date while the WordPress export arrives as
+ * "2025-06-07 10:41:57". Normalise both to the string form the rest of the
+ * module (sorting, URL derivation, schema dates) expects.
+ */
+function toDateString(value: unknown): string {
+  if (!value) return '';
+  if (value instanceof Date) {
+    return Number.isNaN(value.getTime())
+      ? ''
+      : value.toISOString().slice(0, 19).replace('T', ' ');
+  }
+  return String(value);
+}
+
+/**
+ * The admin collects category slugs only, so resolve the display names from
+ * the JSON directly. Deliberately not via getCategories(), which reads posts
+ * to count them and would recurse.
+ */
+function namesForSlugs(slugs: string[]): string[] {
+  const all = categoriesData as Category[];
+  return slugs
+    .map((slug) => all.find((c) => c.slug === slug)?.name)
+    .filter((n): n is string => Boolean(n));
+}
+
+/**
+ * Articles authored in the admin have no `urlPath` to type, so derive the
+ * same /YYYY/MM/DD/slug/ shape WordPress used from the date and slug.
+ */
+function deriveUrlPath(date: string, slug: string): string {
+  // Accepts both "2026-09-24" and "2026-09-24 09:00:00".
+  const d = new Date(`${date.trim().replace(' ', 'T')}Z`);
+  if (Number.isNaN(d.getTime()) || !slug) return '';
+  const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(d.getUTCDate()).padStart(2, '0');
+  return `/${d.getUTCFullYear()}/${mm}/${dd}/${slug}/`;
+}
+
 export function getAllPosts(): Post[] {
   if (cache) return cache;
 
   const files = fs.existsSync(POSTS_DIR)
-    ? fs.readdirSync(POSTS_DIR).filter((f) => f.endsWith('.md'))
+    ? fs
+        .readdirSync(POSTS_DIR)
+        .filter((f) => f.endsWith('.md') || f.endsWith('.mdoc'))
     : [];
 
   const posts = files.map((file) => {
     const raw = fs.readFileSync(path.join(POSTS_DIR, file), 'utf8');
     const { data, content } = matter(raw);
+    const slug = data.slug ?? file.replace(/\.mdoc?$/, '');
+    const date = toDateString(data.date);
+    const categorySlugs: string[] = data.categorySlugs ?? [];
+
     return {
       title: data.title ?? '',
-      slug: data.slug ?? file.replace(/\.md$/, ''),
-      urlPath: data.urlPath ?? '',
-      date: data.date ?? '',
-      modified: data.modified ?? data.date ?? '',
+      slug,
+      urlPath: data.urlPath ?? deriveUrlPath(date, slug),
+      date,
+      modified: toDateString(data.modified) || date,
       seoTitle: data.seoTitle ?? '',
       description: data.description ?? '',
       focusKeyword: data.focusKeyword ?? '',
       readingTime: data.readingTime ?? '',
-      excerpt: data.excerpt ?? '',
+      excerpt: data.excerpt ?? data.description ?? '',
       featuredImage: data.featuredImage,
       featuredAlt: data.featuredAlt ?? '',
-      categories: data.categories ?? [],
-      categorySlugs: data.categorySlugs ?? [],
+      categories: data.categories ?? namesForSlugs(categorySlugs),
+      categorySlugs,
       tags: data.tags ?? [],
-      html: content.trim(),
+      html: renderBody(file, content),
     } satisfies Post;
   });
 

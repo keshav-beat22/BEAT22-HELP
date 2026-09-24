@@ -44,12 +44,14 @@ export const site = {
   /**
    * Profiles emitted as Organization.sameAs, which is how search engines tie
    * this domain to the rest of the brand.
-   *
-   * TODO: add the real profile URLs (Instagram, YouTube, X, LinkedIn). Left
-   * empty deliberately — a wrong sameAs is worse than none, and the property
-   * is omitted entirely while this array is empty.
    */
-  social: [] as readonly string[],
+  social: [
+    'https://www.facebook.com/Beat22app',
+    'https://www.instagram.com/beat22__',
+    'https://x.com/beat22__',
+    'https://www.youtube.com/@beat22app',
+    'https://www.linkedin.com/company/beat22/',
+  ] as readonly string[],
 
   /** Support contact surfaced in the Organization schema. */
   supportWhatsApp: 'https://wa.me/919872066692',
@@ -140,6 +142,19 @@ export const footerNav = [
  * Payment marks shown in the footer's fifth column. Each SVG's viewBox ratio
  * is preserved; the tile sizes them, so only the source and label live here.
  */
+/**
+ * Footer social row. `href` values are the same URLs emitted as
+ * Organization.sameAs, kept in `site.social` so the two can never drift.
+ * `icon` names map to the inline SVG paths in components/SocialLinks.tsx.
+ */
+export const socialLinks = [
+  { label: 'Facebook', icon: 'facebook', href: 'https://www.facebook.com/Beat22app' },
+  { label: 'Instagram', icon: 'instagram', href: 'https://www.instagram.com/beat22__' },
+  { label: 'X', icon: 'x', href: 'https://x.com/beat22__' },
+  { label: 'YouTube', icon: 'youtube', href: 'https://www.youtube.com/@beat22app' },
+  { label: 'LinkedIn', icon: 'linkedin', href: 'https://www.linkedin.com/company/beat22/' },
+] as const;
+
 export const paymentIcons = [
   { src: '/images/brand/credit-card-icon.svg', alt: 'Mastercard' },
   { src: '/images/brand/upi-payment-icon.svg', alt: 'UPI' },

@@ -3,6 +3,7 @@ import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import JsonLd from '@/components/JsonLd';
+import SiteChrome from '@/components/SiteChrome';
 import { site } from '@/lib/site';
 import { graph, organisationSchema, websiteSchema } from '@/lib/seo';
 import { getPopulatedCategories } from '@/lib/posts';
@@ -77,15 +78,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <a className="skip-link" href="#main">
-          Skip to content
-        </a>
-        <JsonLd data={graph(organisationSchema(), websiteSchema())} />
-        <Header categories={categories} />
+        <SiteChrome>
+          <a className="skip-link" href="#main">
+            Skip to content
+          </a>
+          <JsonLd data={graph(organisationSchema(), websiteSchema())} />
+          <Header categories={categories} />
+        </SiteChrome>
         <main id="main" className="site-main">
           {children}
         </main>
-        <Footer />
+        <SiteChrome>
+          <Footer />
+        </SiteChrome>
       </body>
     </html>
   );

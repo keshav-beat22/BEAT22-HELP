@@ -34,7 +34,7 @@ tags:
  	<li>License and pricing</li>
  	<li>Optional settings like enabling negotiations for exclusive beats</li>
 </ul>
-<p style="text-align: left;">For a detailed walkthrough, read our full article: <a href="/how-to-upload-beats/">/how-to-upload-beats/</a></p>
+<p style="text-align: left;">For a detailed walkthrough, read our full article: <a href="/2025/06/19/how-to-upload-beats/">/how-to-upload-beats/</a></p>
 
 <ol style="text-align: left;" start="2">
  	<li>

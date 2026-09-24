@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import BackToTop from './BackToTop';
+import SocialLinks from './SocialLinks';
 import { site, footerNav, paymentIcons } from '@/lib/site';
 
 /** Internal paths route through next/link; anything else is a plain anchor. */
@@ -58,6 +59,7 @@ export default function Footer() {
           >
             {site.footer.signUp.label}
           </a>
+          <SocialLinks />
         </div>
 
         {footerNav.map((column) => (

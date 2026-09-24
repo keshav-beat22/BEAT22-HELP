@@ -56,7 +56,10 @@ Organization ──┬── WebSite ── SearchAction
 - **`BreadcrumbList`** on articles and category pages, referenced by the
   `WebPage` node.
 - **`CollectionPage` + `ItemList`** on category and archive pages.
-- **`Organization`** with logo, description and a support contact point.
+- **`Organization`** with logo, description, support contact point, and
+  `sameAs` linking the Facebook, Instagram, X, YouTube and LinkedIn profiles.
+  Those same URLs render as the footer social row, from one list in
+  `lib/site.ts`, so the two can never drift apart.
 
 Validate with the [Rich Results Test](https://search.google.com/test/rich-results).
 
@@ -89,6 +92,9 @@ comes free. What was done deliberately:
 - **The Visa and UPI marks were 183 KB and 21 KB** — SVGs wrapping oversized
   embedded rasters. Downscaled to 10 KB and 13 KB.
 - **Media is cached immutably** for a year via `next.config.mjs` headers.
+- **YouTube embeds are click-to-load.** A bare `<iframe>` costs about a
+  megabyte of third-party JavaScript per page view; the placeholder costs one
+  thumbnail and loads the player only when asked.
 
 ---
 
@@ -107,19 +113,14 @@ Crawl depth and topical clustering, both of which matter for a help centre:
 
 ## Still needs a human
 
-1. **`site.social` in `lib/site.ts` is empty.** Add the real Instagram,
-   YouTube, X and LinkedIn URLs and they are emitted as `Organization.sameAs`,
-   which is how search engines tie this domain to the rest of the brand. It is
-   omitted entirely while empty — a wrong `sameAs` is worse than none.
-
-2. **Google Search Console.** Verify the property and submit
+1. **Google Search Console.** Verify the property and submit
    `https://help.beat22.com/sitemap.xml` on the day of cutover. Watch Coverage
    and Redirects for two weeks. Do the same in Bing Webmaster Tools.
 
-3. **Image alt text.** Most article images came out of WordPress with
+2. **Image alt text.** Most article images came out of WordPress with
    `alt=""`. They are valid but invisible to image search and to screen
    readers. Filling these in is the single highest-value content task left.
 
-4. **Descriptions are auto-derived for some articles.** All 43 have one under
+3. **Descriptions are auto-derived for some articles.** All 43 have one under
    160 characters, but the ones taken from the first sentence of the body read
    like body copy, not like a search snippet. Worth a pass.

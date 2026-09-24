@@ -178,13 +178,57 @@ settled.
 
 ## Environment variables
 
-Only one, set in **Vercel → Settings → Environment Variables** for all
-environments:
+Set these in **Vercel → Settings → Environment Variables**, for all
+environments.
+
+### Required
 
 ```
 NEXT_PUBLIC_SITE_URL=https://help.beat22.com
 ```
 
-It drives canonicals, Open Graph URLs, the sitemap and the schema `@id`s. If
-it is wrong or missing, every canonical points at the wrong host — which is
-the single most damaging thing that can go wrong at deploy time.
+Drives canonicals, Open Graph URLs, the sitemap and the schema `@id`s. If it
+is wrong or missing, every canonical points at the wrong host — the single
+most damaging thing that can go wrong at deploy time.
+
+### Optional — the admin panel at /admin
+
+```
+KEYSTATIC_GITHUB_CLIENT_ID=
+KEYSTATIC_GITHUB_CLIENT_SECRET=
+KEYSTATIC_SECRET=
+NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=
+```
+
+Deploy first without them, then visit **https://help.beat22.com/keystatic/setup**
+and follow the wizard. It creates the GitHub App and shows you the four values
+to paste in. Redeploy and `/admin` is live.
+
+Until all four are set the admin falls back to local-only mode. The site
+builds and serves normally either way — a missing CMS never blocks a deploy.
+
+Access is the repository's access: only people who can push to
+`IP-music/BEAT22-HELP` can sign in and publish.
+
+---
+
+## Security notes
+
+- There is no database and no PHP. The public site is prerendered HTML.
+- `/admin` and `/keystatic` are `noindex` and carry no site chrome.
+- Publishing goes through GitHub, so every change is attributable and
+  revertable, and removing someone's repo access removes their ability to
+  publish.
+- Security headers (`X-Content-Type-Options`, `X-Frame-Options`,
+  `Referrer-Policy`, `Permissions-Policy`) are set in `next.config.mjs`.
+
+---
+
+## Known advisory
+
+`npm audit` reports a `postcss` advisory. It comes from **Next.js 15's own
+pinned dependency**, not from anything added here, and the only "fix" npm
+offers is a major upgrade to Next 16. Every one of those advisories requires
+processing attacker-controlled CSS at build time; the only CSS this project
+compiles is `app/globals.css`, which is first-party. There is no runtime
+exposure. Revisit when upgrading to Next 16 deliberately.

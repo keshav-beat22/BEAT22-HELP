@@ -48,6 +48,11 @@ function write(items: RecentItem[]) {
 export default function RecentlyViewed({ current }: { current?: RecentItem }) {
   const [items, setItems] = useState<RecentItem[]>([]);
 
+  // localStorage cannot be read during render without breaking hydration —
+  // the server has no access to it, so the first client render must match the
+  // server's empty list and fill in afterwards. That makes the setState below
+  // the correct pattern here rather than a cascading-render mistake.
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     const stored = read();
 
@@ -63,8 +68,14 @@ export default function RecentlyViewed({ current }: { current?: RecentItem }) {
     ].slice(0, LIMIT);
 
     write(next);
+    // The article being read is recorded but not listed — linking to the page
+    // you are already on is noise.
     setItems(next.filter((i) => i.url !== current.url));
+    // `current` is rebuilt every render by the parent, so depending on the
+    // object itself would loop. Its primitive fields are the real inputs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [current?.url, current?.title]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   if (items.length === 0) return null;
 

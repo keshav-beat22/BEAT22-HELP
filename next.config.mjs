@@ -1,7 +1,17 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import redirects from './content/redirects.json' with { type: 'json' };
+
+const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // A stray package-lock.json in the home directory made Next infer
+  // /Users/<you> as the workspace root, which breaks module tracing and the
+  // Vercel build. Pin it to this project.
+  outputFileTracingRoot: projectRoot,
+
   // WordPress served every URL with a trailing slash. Keeping this true is what
   // makes /2025/06/07/how-to-enable-negotiation-feature/ resolve identically to
   // the old site instead of 308-redirecting to a slashless variant.

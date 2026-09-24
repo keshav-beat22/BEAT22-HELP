@@ -9,7 +9,7 @@ description: "Get Kits22 sound kits FREE using Beat22 credits. Access premium so
 focusKeyword: "credit-based sound kits"
 readingTime: "3"
 excerpt: "You asked for it. We built it. The Beat22 SoundKits Marketplace (Kits22) is now LIVE — enabling producers, musicians, and artists to buy, sell, and monetize sound kits globally using a simple credit-based system . This guide explains: How the credit system works How subscribed sellers get Kits22 FRE"
-featuredImage: "/images/2025/12/Beat22-SoundKits-Credits-System-–-Complete-Guide.png"
+featuredImage: "/images/2025/12/Beat22-SoundKits-Credits-System-Complete-Guide.png"
 featuredAlt: "Image of beat22 soundkits and credits system - complete guide"
 categories:
   - "Sales & Earnings"
@@ -133,7 +133,7 @@ With Kits22:
 ✔ Monetize your own sound kits
 ✔ First-mover advantage in the marketplace
 
-Subscriptions aren’t just plans - they are <strong>tools to level up your production game</strong>. <a href="/how-do-i-upgrade-my-account-on-beat22/">Click here</a> to know which plan is best for you.
+Subscriptions aren’t just plans - they are <strong>tools to level up your production game</strong>. <a href="/2025/06/30/how-do-i-upgrade-my-account-on-beat22/">Click here</a> to know which plan is best for you.
 
 <strong>Final Word</strong>
 

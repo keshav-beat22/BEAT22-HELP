@@ -5,6 +5,7 @@ import Breadcrumbs from '@/components/Breadcrumbs';
 import JsonLd from '@/components/JsonLd';
 import PostNavigation from '@/components/PostNavigation';
 import RecentlyViewed from '@/components/RecentlyViewed';
+import YouTubeEmbeds from '@/components/YouTubeEmbeds';
 import {
   getAllPosts,
   getAdjacentPosts,
@@ -186,6 +187,9 @@ export default async function ArticlePage({
                   // Post HTML comes from our own build-time content files.
                   dangerouslySetInnerHTML={{ __html: post.html }}
                 />
+
+                {/* Upgrades any .yt-embed placeholder in the body above. */}
+                <YouTubeEmbeds />
 
                 <PostNavigation previous={previous} next={next} />
               </div>

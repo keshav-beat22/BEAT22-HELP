@@ -4,6 +4,8 @@ Build content/ and public/images/ for the Next.js site from the WordPress export
 
   python3 scripts/build-content.py <wordpress-export.xml> <wp-uploads-dir>
   python3 scripts/build-content.py --lazy-images   # re-apply lazy <img> only
+  python3 scripts/build-content.py --fix-links     # repair bare-slug links
+  python3 scripts/build-content.py --fix-media     # repair featuredImage paths
 
 Produces:
   content/posts/<slug>.md    frontmatter + original post HTML
@@ -31,6 +33,17 @@ os.makedirs(IMG_DIR, exist_ok=True)
 SITE = 'https://help.beat22.com'
 
 
+def safe_path(p):
+    """WordPress allows en-dashes and other non-ASCII in filenames, and archive
+    tools re-encode them (a en-dash becomes '#U2013'). Both forms break URLs.
+    Normalise every media path to plain ASCII once, here, so the file on disk
+    and the reference in the HTML can never disagree."""
+    d, base = os.path.split(p)
+    base = re.sub(r'[^A-Za-z0-9._-]+', '-', base)
+    base = re.sub(r'-{2,}', '-', base)
+    return f'{d}/{base}' if d else base
+
+
 def lazy_images(body):
     """Mark post-body images lazy.
 
@@ -48,6 +61,82 @@ def lazy_images(body):
         return tag[:4] + ' loading="lazy" decoding="async"' + tag[4:]
 
     return re.sub(r'<img\b[^>]*>', add, body, flags=re.I)
+
+
+def _slug_to_urlpath():
+    """Map every article slug to its real dated URL."""
+    out = {}
+    for name in os.listdir(POSTS_DIR):
+        if not name.endswith(('.md', '.mdoc')):
+            continue
+        with open(os.path.join(POSTS_DIR, name), encoding='utf-8') as f:
+            text = f.read()
+        slug = re.search(r'^slug:\s*"?([^"\n]+)"?', text, re.M)
+        url = re.search(r'^urlPath:\s*"?([^"\n]+)"?', text, re.M)
+        if slug and url:
+            out[slug.group(1).strip()] = url.group(1).strip()
+    return out
+
+
+def retrofit_featured_images():
+    """Repair featuredImage frontmatter that points at a non-existent file.
+
+    Body media was normalised through safe_path() at import, but the featured
+    image was not, so any attachment whose filename contained an en-dash or
+    other non-ASCII character was left pointing at a path that does not exist.
+    That silently broke the og:image for those articles.
+    """
+    changed = 0
+    for name in sorted(os.listdir(POSTS_DIR)):
+        if not name.endswith(('.md', '.mdoc')):
+            continue
+        path = os.path.join(POSTS_DIR, name)
+        with open(path, encoding='utf-8') as f:
+            text = f.read()
+        m = re.search(r'^featuredImage:\s*"?([^"\n]+)"?', text, re.M)
+        if not m:
+            continue
+        ref = m.group(1).strip()
+        if os.path.exists(os.path.join(ROOT, 'public' + ref)):
+            continue
+        fixed = safe_path(ref)
+        if not os.path.exists(os.path.join(ROOT, 'public' + fixed)):
+            print(f'  no file on disk for {name}: {ref}')
+            continue
+        text = text.replace(f'featuredImage: "{ref}"', f'featuredImage: "{fixed}"')
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write(text)
+        changed += 1
+        print(f'  {name}: {ref} -> {fixed}')
+    print(f'featured-images: updated {changed} file(s)')
+
+
+def retrofit_internal_links():
+    """Repair in-body links that point at a bare slug.
+
+    The import rewrites https://help.beat22.com/<path> to /<path>. For a link
+    between two articles that produced /<slug>/, but the real permalink is
+    /YYYY/MM/DD/<slug>/, so every cross-reference between articles 404'd.
+    Rewrites them to the dated URL. Safe to re-run.
+    """
+    mapping = _slug_to_urlpath()
+    changed = total = 0
+    for name in sorted(os.listdir(POSTS_DIR)):
+        if not name.endswith(('.md', '.mdoc')):
+            continue
+        path = os.path.join(POSTS_DIR, name)
+        with open(path, encoding='utf-8') as f:
+            text = f.read()
+        original = text
+        for slug, url_path in mapping.items():
+            # Only bare /<slug>/ hrefs; already-dated links are left alone.
+            text = text.replace(f'href="/{slug}/"', f'href="{url_path}"')
+        if text != original:
+            with open(path, 'w', encoding='utf-8') as f:
+                f.write(text)
+            changed += 1
+            total += original.count('href="/')  - text.count('href="/')
+    print(f'internal-links: updated {changed} file(s)')
 
 
 def retrofit_lazy_images():
@@ -81,19 +170,16 @@ if len(sys.argv) > 1 and sys.argv[1] == '--lazy-images':
     retrofit_lazy_images()
     sys.exit(0)
 
+if len(sys.argv) > 1 and sys.argv[1] == '--fix-links':
+    retrofit_internal_links()
+    sys.exit(0)
+
+if len(sys.argv) > 1 and sys.argv[1] == '--fix-media':
+    retrofit_featured_images()
+    sys.exit(0)
+
 XML = sys.argv[1]
 UPLOADS = sys.argv[2] if len(sys.argv) > 2 else None
-
-
-def safe_path(p):
-    """WordPress allows en-dashes and other non-ASCII in filenames, and archive
-    tools re-encode them (a en-dash becomes '#U2013'). Both forms break URLs.
-    Normalise every media path to plain ASCII once, here, so the file on disk
-    and the reference in the HTML can never disagree."""
-    d, base = os.path.split(p)
-    base = re.sub(r'[^A-Za-z0-9._-]+', '-', base)
-    base = re.sub(r'-{2,}', '-', base)
-    return f'{d}/{base}' if d else base
 
 
 def disk_candidates(rel):
@@ -176,6 +262,11 @@ for i in items:
 
     thumb = meta.get('_thumbnail_id')
     featured = att.get(thumb, {}).get('local') if thumb else None
+    # The body's media paths go through safe_path(); the featured image must
+    # too, or the frontmatter points at a filename that is not on disk and the
+    # og:image 404s.
+    if featured:
+        featured = safe_path(featured)
     featured_alt = att.get(thumb, {}).get('alt', '') if thumb else ''
     if featured:
         referenced.add(featured)

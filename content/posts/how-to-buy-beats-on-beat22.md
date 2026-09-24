@@ -56,7 +56,7 @@ Beat22 supports:
 <img loading="lazy" decoding="async" class="alignnone size-full wp-image-673" src="/images/2025/07/Screenshot-2026-02-14-142935-1.png" alt="" width="500" height="699" /></li>
 </ul>
 Make the payment and you’re done!
-<h2><strong>Learn how to get beats after purchase: <a href="/how-can-i-download-my-purchased-beats/">Click here</a></strong></h2>
+<h2><strong>Learn how to get beats after purchase: <a href="/2025/07/07/how-can-i-download-my-purchased-beats/">Click here</a></strong></h2>
 <ul>
  	<li> Please click on “<strong>Browse</strong>” in the menu section</li>
  	<li>Then click on “<strong>Your Orders</strong>”</li>

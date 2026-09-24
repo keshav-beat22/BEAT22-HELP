@@ -1,11 +1,64 @@
 # Adding and editing content
 
-This replaces `wp-admin`. There is no login and no database — an article is a
-file, and publishing is a git push.
+This replaces `wp-admin`. There is no database — an article is a file, and
+publishing is a git commit.
+
+There are two ways in. Use whichever suits the moment.
 
 ---
 
-## Add an article
+## 1. The admin panel (the WordPress-like way)
+
+**https://help.beat22.com/admin**
+
+Sign in with GitHub. You get a visual editor: rich text, headings, links,
+image upload, category pickers. Saving commits to the repository and the site
+redeploys automatically.
+
+Locally, `npm run cms` gives you the same editor at
+`http://localhost:3000/admin` writing straight to your working copy.
+
+### What the admin can and cannot do
+
+| | |
+|---|---|
+| Create new articles | Yes |
+| Edit articles created in the admin | Yes |
+| Upload images | Yes — they land in `public/images/uploads/` |
+| Edit the 43 articles migrated from WordPress | **No** — see below |
+| Create new *pages* (like `/buyers/`) | **No** — pages are code |
+
+The 43 migrated articles are `.md` files whose bodies are the original
+WordPress HTML, preserved byte-for-byte so the migration could be verified.
+The admin writes `.mdoc` files with Markdown bodies. Both render identically
+on the site, but the editor only lists the format it owns. To edit a migrated
+article, edit the file (option 2). Converting them to the admin's format is
+possible — ask, and it can be done as a separate, verified change.
+
+### First-time setup
+
+The admin needs a GitHub App. Visit **/keystatic/setup** on the deployed site
+once and follow the wizard — it creates the app and shows you four values to
+paste into Vercel → Settings → Environment Variables:
+
+```
+KEYSTATIC_GITHUB_CLIENT_ID
+KEYSTATIC_GITHUB_CLIENT_SECRET
+KEYSTATIC_SECRET
+NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
+```
+
+Redeploy and the admin is live. Until those are set the site still builds and
+serves normally — the admin just runs in local-only mode.
+
+Only people with write access to the GitHub repository can sign in, so
+removing someone's repo access removes their ability to publish.
+
+---
+
+## 2. The file way
+
+### Add an article with the script
 
 ```bash
 python3 scripts/new-article.py "How do I withdraw my earnings?" \
@@ -22,7 +75,7 @@ frontmatter and prints the URL it will live at. Then:
 Run it with no category to see every available category slug. It refuses to
 overwrite an existing file or reuse a URL.
 
-### Flags
+#### Flags
 
 | Flag | Meaning |
 |---|---|
@@ -34,7 +87,7 @@ overwrite an existing file or reuse a URL.
 
 ---
 
-## Edit an article
+### Edit an article
 
 Open the file in `content/posts/`, change it, push.
 
@@ -51,7 +104,7 @@ move a page, add an entry to `content/redirects.json`:
 
 ---
 
-## The frontmatter
+## Frontmatter reference
 
 ```yaml
 ---
@@ -80,9 +133,15 @@ article to a previously empty category just works — no counter to update.
 
 ---
 
-## Body
+## Writing the body
 
-The body is HTML (that is what came out of WordPress) and Markdown also works.
+The body format follows the file extension:
+
+- `.md` — raw HTML. This is what the 43 migrated WordPress articles use.
+- `.mdoc` — Markdown, converted to HTML at build time. This is what the admin
+  and `new-article.py` write.
+
+Both render identically on the page.
 
 ```html
 <p>Short answer first — one or two sentences that resolve the question.</p>
@@ -95,9 +154,42 @@ Use `<h3>` for sub-headings. `<h1>` is the article title and `<h2>` belongs to
 the page furniture, so starting in-body headings at `<h3>` keeps the outline
 correct.
 
-### Images
+---
 
-Put the file in `public/images/` and reference it from the root:
+## Embedding a YouTube video
+
+Drop this where the video should appear in the body:
+
+```html
+<div class="yt-embed"
+     data-video-id="dQw4w9WgXcQ"
+     data-title="How to upload beats on Beat22"></div>
+```
+
+`data-video-id` is the 11-character id from the URL — in
+`https://www.youtube.com/watch?v=dQw4w9WgXcQ` it is `dQw4w9WgXcQ`. For a
+`youtu.be/dQw4w9WgXcQ` link it is the part after the slash.
+
+`data-title` is shown over the thumbnail and read aloud by screen readers, so
+write a real description rather than "video".
+
+The page renders a thumbnail with a play button and only loads YouTube's
+player when someone clicks. A plain `<iframe>` pulls roughly a megabyte of
+third-party JavaScript on every page view whether the video is watched or not,
+which is the fastest way to lose the page-speed scores the rest of the site is
+tuned for. Playback uses `youtube-nocookie.com`, so no tracking cookie is set
+until the visitor actually presses play.
+
+An invalid id renders nothing rather than a broken player.
+
+---
+
+## Images
+
+**From the admin:** use the image button in the editor. Files land in
+`public/images/uploads/` and are committed with the article.
+
+**By hand:** put the file in `public/images/` and reference it from the root:
 
 ```html
 <img src="/images/2026/01/studio-controls.png"
@@ -105,13 +197,18 @@ Put the file in `public/images/` and reference it from the root:
      width="900" height="500" loading="lazy" decoding="async" />
 ```
 
-- **Always write a real `alt`.** It is read aloud by screen readers and it is
-  what image search indexes. Empty `alt=""` is only correct for pure decoration.
-- **Always give `width` and `height`.** Without them the page reflows as images
-  load, which is a Core Web Vitals penalty.
-- `loading="lazy"` on body images; if you forget,
-  `python3 scripts/build-content.py --lazy-images` adds it to every article and
-  is safe to re-run.
+Three things matter every time:
+
+- **A real `alt`.** It is read aloud by screen readers and it is what image
+  search indexes. Empty `alt=""` is only correct for pure decoration.
+- **`width` and `height`.** Without them the page reflows as images load,
+  which is a Core Web Vitals penalty.
+- **`loading="lazy"`.** If you forget,
+  `python3 scripts/build-content.py --lazy-images` adds it everywhere and is
+  safe to re-run.
+
+Keep files under about 300 KB. Resize before committing rather than relying on
+the browser to scale a 4000px screenshot down to 900px.
 
 ---
 
@@ -143,3 +240,20 @@ point.
   which is the only thing that should rewrite articles wholesale.
 - `lib/seo.ts` — unless you are deliberately changing structured data.
 - `next.config.mjs` `trailingSlash` — every legacy URL depends on it.
+
+---
+
+## Maintenance commands
+
+All safe to re-run; each prints what it changed and is a no-op when there is
+nothing to do.
+
+```bash
+python3 scripts/build-content.py --lazy-images   # add loading="lazy" to body images
+python3 scripts/build-content.py --fix-links     # repair /slug/ links to the dated URL
+python3 scripts/build-content.py --fix-media     # repair featuredImage paths
+```
+
+`--fix-links` exists because the WordPress import rewrote
+`https://help.beat22.com/<slug>/` to `/<slug>/`, but the real permalink is
+`/YYYY/MM/DD/<slug>/`. Six article cross-links were 404ing because of it.

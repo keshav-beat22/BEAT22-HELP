@@ -66,11 +66,11 @@ Click on <strong>Account</strong> and fill in the following information:
 </ol>
 <ul>
  	<li>Verify the mobile number.</li>
- 	<li>Verify Aadhaar card. To learn to verify mobile no. and Aadhaar card: <a href="/how-to-verify-your-mobile-number-and-aadhaar-on-beat22/">Click here</a>
+ 	<li>Verify Aadhaar card. To learn to verify mobile no. and Aadhaar card: <a href="/2025/11/05/how-to-verify-your-mobile-number-and-aadhaar-on-beat22/">Click here</a>
 
 <strong>2. Under Studio Information:</strong></li>
- 	<li>Fill in the studio name. <a href="/how-can-i-change-my-studio-name/">Click here to know more</a></li>
- 	<li>Fill in the studio handle. <a href="/how-can-i-change-my-studio-handle/">Click here to know more</a>
+ 	<li>Fill in the studio name. <a href="/2025/06/30/how-can-i-change-my-studio-name/">Click here to know more</a></li>
+ 	<li>Fill in the studio handle. <a href="/2025/06/30/how-can-i-change-my-studio-handle/">Click here to know more</a>
 <strong>
 3. Billing Address
 <img loading="lazy" decoding="async" class="alignnone size-full wp-image-590" src="/images/2025/09/Screenshot-2025-09-08-184207.png" alt="" width="679" height="356" />
@@ -125,6 +125,6 @@ Final Step: Submit for Approval</strong></li>
 </ul>
 </li>
  	<li>Once approved, you can immediately start uploading your beats.
-Click here to learn how: <a href="/how-to-upload-beats/"><strong><u>How to Upload Beats on Beat22</u></strong></a></li>
+Click here to learn how: <a href="/2025/06/19/how-to-upload-beats/"><strong><u>How to Upload Beats on Beat22</u></strong></a></li>
 </ul>
 Remember: The more complete and professional your setup, the more buyers will trust you and purchase your beats.
