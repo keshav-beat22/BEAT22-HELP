@@ -11,7 +11,8 @@
     "start": "next start",
     "lint": "eslint .",
     "content": "python3 scripts/build-content.py",
-    "cms": "next dev"
+    "cms": "next dev",
+    "verify": "node scripts/verify-deployment.mjs"
   },
   "dependencies": {
     "@keystatic/core": "^0.6.9",

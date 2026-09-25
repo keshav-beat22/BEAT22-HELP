@@ -7,16 +7,13 @@ Budget about an hour, plus DNS propagation.
 
 ---
 
-## 1. Push to GitHub
+## 1. Push to GitHub — done
 
-```bash
-git push
-```
+`origin/main` matches local: 422 files, 43 articles, 12 categories, 306 images,
+and no secrets committed (only `.env.example`, which holds names and no values).
 
-The remote and branch are already set, and this is a clean fast-forward — no
-`--force`, no merge. If it is rejected, stop and re-read; do not force.
-
-Then on github.com: **Settings → General → confirm the repository is Private.**
+One thing still to confirm on github.com:
+**Settings → General → make sure the repository is Private.**
 
 ---
 
@@ -63,6 +60,22 @@ passes.
 - [ ] Paste an article URL into WhatsApp or Slack: the share card renders
 - [ ] Resize to 375px and 768px — nothing overflows sideways
 - [ ] Run the page through PageSpeed Insights; expect green
+
+Or let the script do it:
+
+```bash
+npm run verify https://<your-project>.vercel.app
+```
+
+It reads the repo's own content, so it checks the site you actually deployed:
+every article URL, every legacy redirect, the sitemap, canonicals, og:images,
+descriptions, h1 counts, security headers, WebP delivery and that the admin is
+kept out of the sitemap. It exits non-zero on failure.
+
+On the preview URL it will note that the canonical points at
+`help.beat22.com` while you tested a `vercel.app` address. That is correct —
+canonicals must name the final domain. Run it again after the cutover and the
+note should disappear.
 
 If something fails here, it is a code or content problem and the old site is
 still serving traffic. That is the point of testing before DNS.
@@ -136,6 +149,89 @@ curl -sI https://help.beat22.com/ | head -3
 - [ ] Spot-check five old URLs you know are linked from elsewhere
 - [ ] Confirm `https://` (not `http://`) and no certificate warning
 
+---
+
+## 7. Decommission the old WordPress site
+
+**Not before the new site has been live and correct for at least 48 hours.**
+Until DNS has fully propagated and you have watched Search Console for a day
+or two, the old install is your rollback. Deleting it early removes that.
+
+### Order matters
+
+1. New site live on `help.beat22.com` and `npm run verify https://help.beat22.com`
+   passes
+2. Wait 48 hours
+3. Back up
+4. Then delete
+
+### Back up first — but treat the backup as contaminated
+
+That install was compromised. The backup is for content recovery only.
+
+In Hostinger hPanel:
+
+- **Files → File Manager**, navigate to the `help` subdomain's document root
+  (usually `public_html/help` or a folder named for the subdomain). Compress it
+  and download the archive.
+- **Databases → phpMyAdmin**, select the WordPress database, **Export → Go**,
+  and download the `.sql`.
+
+Store both offline — an external drive, not a shared folder that syncs.
+
+**Never restore this backup to a live server.** A compromised WordPress almost
+always carries a backdoor in a theme file, an uploads folder, or a database
+option row. It is an archive, not a recovery point. If you ever need an old
+article from it, copy the text out by hand.
+
+### Delete, in this order
+
+1. **Database user and database.** hPanel → **Databases → MySQL Databases**.
+   Delete the WordPress user first, then the database. Removing the user first
+   means nothing can reconnect while you work.
+2. **Files.** File Manager → the subdomain's document root → select all →
+   delete. Include the dotfiles: `.htaccess`, `.user.ini`, and anything like
+   `.wp-config.php.bak`. Hidden files are hidden by default — turn them on in
+   the File Manager settings first, because backdoors live there.
+3. **Cron jobs.** hPanel → **Advanced → Cron Jobs**. WordPress plugins often
+   leave `wp-cron.php` entries or custom scripts. Delete anything pointing at
+   the deleted folder.
+4. **The subdomain entry.** hPanel → **Domains → Subdomains**. Remove `help`
+   *only after* the CNAME is in place and working — deleting the subdomain can
+   remove its DNS record too, which would take the new site down.
+5. **PHP / hosting extras.** If the subdomain had its own PHP version,
+   `.htaccess` redirects, or a firewall rule, remove those too.
+
+### Check for things WordPress leaves behind
+
+- **Email forwarders and MX records: leave them alone.** If `beat22.com`
+  handles mail, its MX, SPF, DKIM and DMARC records are unrelated to the help
+  centre. Do not touch them. This is the single easiest way to break something
+  that has nothing to do with this migration.
+- **A CDN or proxy in front.** If Cloudflare or Hostinger's own CDN was
+  proxying `help.beat22.com`, turn the proxy off for that subdomain — a proxy
+  will shadow the Vercel CNAME. Purge its cache afterwards.
+- **An old SSL certificate** for the subdomain. Harmless, but tidy to remove
+  once Vercel is issuing its own.
+- **Third-party integrations.** Revoke API keys the old site held: Jetpack,
+  security plugins, backup services, analytics, anything with write access.
+  A compromised site's keys should be assumed leaked.
+- **Search Console.** Keep the old property if it was `https://help.beat22.com`
+  — it is the same URL, so the history carries over. Only remove a property
+  that pointed somewhere else.
+
+### Because it was compromised
+
+- Change the **Hostinger account password** and turn on 2FA.
+- Change the **database password** before deleting, if you reuse that password
+  anywhere.
+- If the WordPress admin email was reused elsewhere, change that password too.
+- Do not reinstall WordPress on that subdomain "just in case". The reason this
+  migration happened was that the install kept being a target; leaving an empty
+  one behind reintroduces it.
+
+---
+
 ## First two weeks
 
 - Search Console → **Pages**: watch for crawl errors
@@ -154,6 +250,9 @@ curl -sI https://help.beat22.com/ | head -3
 | `/admin` says "not configured" | The four env vars are missing, or no redeploy | Add them, redeploy |
 | A page 404s that used to work | A `urlPath` was changed | Revert it, or add a redirect to `content/redirects.json` |
 | Site looks unstyled for a moment | Normal on first hit of a cold cache | No action |
+| Old WordPress still appears | DNS cached, or a proxy is shadowing the CNAME | Check `dig +short help.beat22.com`, turn off any proxy |
+| Email stopped working | An MX record was deleted during cleanup | Restore MX/SPF/DKIM; they are unrelated to this site |
+| `npm run verify` fails on canonical | `NEXT_PUBLIC_SITE_URL` does not match the domain | Fix the env var, redeploy |
 
 Every deploy is revertable: **Vercel → Deployments → ⋯ → Promote to
 Production** on the previous one. That is instant and is your rollback.
