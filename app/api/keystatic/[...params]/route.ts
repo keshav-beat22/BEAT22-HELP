@@ -2,21 +2,27 @@ import { makeRouteHandler } from '@keystatic/next/route-handler';
 import config from '@/keystatic.config';
 
 /**
- * Admin API. Mirrors the guard on the UI route: until the GitHub App secrets
- * exist, the local-storage fallback would try to read and write a filesystem
- * that is read-only in production, so the endpoints simply do not exist.
+ * Built on first request, not at module scope.
+ *
+ * makeRouteHandler throws immediately when the GitHub secrets are absent, and
+ * `next build` imports this module to collect route data — so building it
+ * eagerly made the whole site fail to deploy until the CMS was configured.
+ * Deferring it means the site builds and serves normally, and only the admin
+ * endpoints report the misconfiguration, which is the correct blast radius.
  */
-const configured = Boolean(
-  process.env.KEYSTATIC_GITHUB_CLIENT_ID &&
-    process.env.KEYSTATIC_GITHUB_CLIENT_SECRET &&
-    process.env.KEYSTATIC_SECRET,
-);
+let handler: ReturnType<typeof makeRouteHandler> | null = null;
 
-const handler = makeRouteHandler({ config });
-const gone = () => new Response('Not found', { status: 404 });
-const live = configured || process.env.NODE_ENV !== 'production';
+function routes() {
+  handler ??= makeRouteHandler({ config });
+  return handler;
+}
 
-export const GET = live ? handler.GET : gone;
-export const POST = live ? handler.POST : gone;
+export async function GET(request: Request) {
+  return routes().GET(request);
+}
+
+export async function POST(request: Request) {
+  return routes().POST(request);
+}
 
 export const dynamic = 'force-dynamic';

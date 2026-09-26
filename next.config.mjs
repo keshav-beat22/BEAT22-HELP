@@ -12,6 +12,15 @@ const nextConfig = {
   // Vercel build. Pin it to this project.
   outputFileTracingRoot: projectRoot,
 
+  // not-found.tsx lists recent articles, so any route that can 404 at request
+  // time needs the content files in its bundle. Pages that read content at
+  // build time get it traced automatically; the admin route does not, which
+  // left its 404 showing "No articles here yet" while the normal 404 showed
+  // the full list.
+  outputFileTracingIncludes: {
+    '/**': ['./content/**/*'],
+  },
+
   // WordPress served every URL with a trailing slash. Keeping this true is what
   // makes /2025/06/07/how-to-enable-negotiation-feature/ resolve identically to
   // the old site instead of 308-redirecting to a slashless variant.
