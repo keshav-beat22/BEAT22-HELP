@@ -42,15 +42,16 @@ keystatic.config  what the admin shows and where it writes
 
 ## How changes get deployed
 
-Two repositories, one of which Vercel watches.
+`ashishIPM/BEAT22-HELP` is the canonical repository and the only one Vercel
+watches. Branches and pull requests both live there.
 
 | Remote | Repository | Role |
 |---|---|---|
-| `upstream` | `ashishIPM/BEAT22-HELP` | Canonical. **Vercel deploys `main` from here.** |
-| `origin` | `keshav-beat22/BEAT22-HELP` | Personal fork. Vercel ignores it. |
+| `upstream` | `ashishIPM/BEAT22-HELP` | Canonical. Branches, PRs and deploys. |
+| `origin` | `keshav-beat22/BEAT22-HELP` | Personal mirror. Optional, not part of the flow. |
 
-Nothing is pushed straight to `upstream/main` — changes go through a pull
-request so there is a review point before anything reaches production.
+Nothing is pushed straight to `main` — changes go through a pull request so
+there is a review point before anything reaches production.
 
 ```bash
 # start from the canonical main
@@ -61,23 +62,35 @@ git pull upstream main
 git checkout -b your-change
 git commit -am "What changed"
 
-# push the branch to your own fork
-git push -u origin your-change
+# push the branch to the canonical repo
+git push -u upstream your-change
 ```
 
-Then open a PR from `keshav-beat22:your-change` into `ashishIPM:main`.
-Merging it is what triggers the deploy.
+Open the PR inside `ashishIPM/BEAT22-HELP`, base `main`. Merging it is what
+triggers the deploy.
 
-After a merge, resync both:
+After the merge:
 
 ```bash
 git checkout main
 git pull upstream main
-git push origin main      # keep the fork level; GitHub does not do this for you
+git branch -d your-change
+git push upstream --delete your-change
 ```
 
-A fork does not sync itself. If `origin/main` drifts behind `upstream/main`,
-new branches start from stale code.
+### Why not a fork
+
+Everyone working on this has write access to the canonical repository, so a
+fork adds a second place for branches to live without adding any control. A
+branch pushed to a fork also puts GitHub's "create pull request" prompt on the
+fork rather than on the repository that deploys, which is confusing.
+
+The `origin` mirror is harmless to keep as a personal backup. If you do keep
+it, remember GitHub never syncs a fork for you:
+
+```bash
+git push origin main
+```
 
 ## Rules that must not change
 
