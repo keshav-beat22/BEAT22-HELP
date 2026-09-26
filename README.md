@@ -40,6 +40,45 @@ keystatic.config  what the admin shows and where it writes
 | Understand the SEO setup | [SEO.md](docs/SEO.md) |
 | Understand how the admin is secured | [SECURITY.md](docs/SECURITY.md) |
 
+## How changes get deployed
+
+Two repositories, one of which Vercel watches.
+
+| Remote | Repository | Role |
+|---|---|---|
+| `upstream` | `ashishIPM/BEAT22-HELP` | Canonical. **Vercel deploys `main` from here.** |
+| `origin` | `keshav-beat22/BEAT22-HELP` | Personal fork. Vercel ignores it. |
+
+Nothing is pushed straight to `upstream/main` — changes go through a pull
+request so there is a review point before anything reaches production.
+
+```bash
+# start from the canonical main
+git checkout main
+git pull upstream main
+
+# branch, work, commit
+git checkout -b your-change
+git commit -am "What changed"
+
+# push the branch to your own fork
+git push -u origin your-change
+```
+
+Then open a PR from `keshav-beat22:your-change` into `ashishIPM:main`.
+Merging it is what triggers the deploy.
+
+After a merge, resync both:
+
+```bash
+git checkout main
+git pull upstream main
+git push origin main      # keep the fork level; GitHub does not do this for you
+```
+
+A fork does not sync itself. If `origin/main` drifts behind `upstream/main`,
+new branches start from stale code.
+
 ## Rules that must not change
 
 - `trailingSlash: true` in `next.config.mjs` — every legacy WordPress URL
