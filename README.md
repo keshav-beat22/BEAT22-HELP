@@ -32,11 +32,11 @@ keystatic.config  what the admin shows and where it writes
 
 | I want to… | Do this |
 |---|---|
-| Add or edit an article, embed a video, upload an image | [CONTENT.md](CONTENT.md) |
+| Add or edit an article, embed a video, upload an image | [CONTENT.md](docs/CONTENT.md) |
 | Change footer links, logo, CTA | `lib/site.ts` — content only, no components |
-| Go live, and the hosting choice | [GO-LIVE.md](GO-LIVE.md) |
-| Understand the SEO setup | [SEO.md](SEO.md) |
-| Understand how the admin is secured | [SECURITY.md](SECURITY.md) |
+| Go live, and the hosting choice | [GO-LIVE.md](docs/GO-LIVE.md) |
+| Understand the SEO setup | [SEO.md](docs/SEO.md) |
+| Understand how the admin is secured | [SECURITY.md](docs/SECURITY.md) |
 
 ## Rules that must not change
 

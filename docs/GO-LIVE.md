@@ -20,7 +20,7 @@ One thing still to confirm on github.com:
 ## 2. Create the Vercel project
 
 1. vercel.com → sign in with GitHub → **Add New → Project**
-2. Pick `IP-music/BEAT22-HELP`
+2. Pick `ashishIPM/BEAT22-HELP`
 3. Framework preset is detected as **Next.js** — change nothing
 4. Before clicking Deploy, open **Environment Variables** and add:
 

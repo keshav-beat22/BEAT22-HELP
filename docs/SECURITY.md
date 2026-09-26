@@ -27,7 +27,7 @@ site to leak — because there is no password for this site.
 Sign-in is GitHub OAuth against a GitHub App you own.
 
 **Authorisation is repository write access.** After signing in, Keystatic
-checks whether that GitHub account can push to `IP-music/BEAT22-HELP`. If it
+checks whether that GitHub account can push to `ashishIPM/BEAT22-HELP`. If it
 cannot, the admin is read-only to them. Access is therefore managed in one
 place — GitHub's repository settings.
 

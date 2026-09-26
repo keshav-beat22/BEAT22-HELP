@@ -32,7 +32,14 @@ const IMAGE_PATH = '/images/';
 
 export default config({
   storage: gitHubAppConfigured
-    ? { kind: 'github', repo: { owner: 'IP-music', name: 'BEAT22-HELP' } }
+    ? {
+        kind: 'github',
+        // The repository the admin commits to. Must match the repo the
+        // Keystatic GitHub App was installed on, and the repo Vercel deploys
+        // from — if these three disagree, saving in the admin silently writes
+        // somewhere nobody is watching.
+        repo: { owner: 'ashishIPM', name: 'BEAT22-HELP' },
+      }
     : { kind: 'local' },
 
   ui: {
