@@ -110,36 +110,64 @@ never blocks a deploy.
 
 ## 5. Point the domain (Hostinger)
 
-1. Vercel → **Settings → Domains → Add** `help.beat22.com`. Vercel shows the
-   exact record — prefer its values over the illustrative ones below.
-2. Hostinger → **Domains → beat22.com → DNS / Nameservers → Manage DNS records**
-3. **Delete the existing `help` record** left over from the WordPress host.
-   If you leave it, the old record wins and the cutover silently does nothing.
-4. Add:
+### What is there today
+
+Checked live, so these are the actual current values:
+
+| Record | Current value | Meaning |
+|---|---|---|
+| `help.beat22.com` | **A** → `193.203.185.75`, TTL 1800 | The old WordPress, on Hostinger LiteSpeed |
+| `beat22.com` (apex) | A → `75.2.60.5` | The main site, hosted elsewhere — **do not touch** |
+| `beat22.com` MX | `smtp.google.com` | Google Workspace email — **do not touch** |
+
+The record to change is an **A record**, not a CNAME. You cannot have both an
+A and a CNAME on the same hostname, so the A record must be deleted, not edited
+around.
+
+TTL is 1800, so propagation is about 30 minutes, not hours.
+
+### Steps
+
+1. **Vercel → Settings → Domains → Add** `help.beat22.com`.
+   Vercel then shows the exact record to create. **Use the value it shows you.**
+   Each project now gets its own CNAME target that looks like
+   `d1d4fc829fe7bc7c.vercel-dns-017.com` — the old shared
+   `cname.vercel-dns.com` is not what new projects are given.
+
+2. **Hostinger → Domains → beat22.com → DNS / Nameservers → Manage DNS records.**
+
+3. **Delete** the existing `help` **A** record pointing at `193.203.185.75`.
+
+4. **Add** the CNAME Vercel gave you:
 
    | Type | Name | Points to | TTL |
    |---|---|---|---|
-   | CNAME | `help` | `cname.vercel-dns.com` | 300 |
+   | CNAME | `help` | *(the value from Vercel, ending `.vercel-dns-0XX.com`)* | 300 |
 
-5. Wait for Vercel to show **Valid Configuration**. HTTPS is automatic.
+5. Wait for Vercel to show **Valid Configuration**. HTTPS is issued
+   automatically once it does.
 
-Only the `help` subdomain moves. The apex `beat22.com` and every other record
-stay exactly as they are — **do not change nameservers.**
+### Leave these completely alone
 
-If Hostinger's editor has a proxy or "website redirect" toggle on the `help`
-record, turn it off; a redirect record shadows the CNAME.
+- **MX, SPF, DKIM, DMARC** — that is Google Workspace email for the whole
+  company. Nothing about this migration touches mail.
+- **The apex `beat22.com` A record** and any `www` record — different host,
+  different site.
+- **Nameservers** — they stay at Hostinger. Only one record changes.
 
-Propagation is usually minutes, but the *old* TTL applies first. If the old
-record had a 14400 TTL, allow up to four hours before assuming something broke.
+If Hostinger shows a proxy or "website redirect" toggle on the `help` record,
+turn it off; a redirect record shadows the CNAME.
 
-Check from outside your own cache:
+### Verify from outside your own cache
 
 ```bash
-dig +short help.beat22.com
+dig +short help.beat22.com          # expect the vercel-dns target, not 193.203.185.75
 curl -sI https://help.beat22.com/ | head -3
+npm run verify https://help.beat22.com
 ```
 
----
+The verifier's canonical note should disappear once the domain is live — that
+is the signal the cutover is complete and correct.
 
 ## 6. Same day
 
