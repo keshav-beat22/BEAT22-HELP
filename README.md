@@ -40,6 +40,58 @@ keystatic.config  what the admin shows and where it writes
 | Understand the SEO setup | [SEO.md](docs/SEO.md) |
 | Understand how the admin is secured | [SECURITY.md](docs/SECURITY.md) |
 
+## How changes get deployed
+
+`ashishIPM/BEAT22-HELP` is the canonical repository and the only one Vercel
+watches. Branches and pull requests both live there.
+
+| Remote | Repository | Role |
+|---|---|---|
+| `upstream` | `ashishIPM/BEAT22-HELP` | Canonical. Branches, PRs and deploys. |
+| `origin` | `keshav-beat22/BEAT22-HELP` | Personal mirror. Optional, not part of the flow. |
+
+Nothing is pushed straight to `main` — changes go through a pull request so
+there is a review point before anything reaches production.
+
+```bash
+# start from the canonical main
+git checkout main
+git pull upstream main
+
+# branch, work, commit
+git checkout -b your-change
+git commit -am "What changed"
+
+# push the branch to the canonical repo
+git push -u upstream your-change
+```
+
+Open the PR inside `ashishIPM/BEAT22-HELP`, base `main`. Merging it is what
+triggers the deploy.
+
+After the merge:
+
+```bash
+git checkout main
+git pull upstream main
+git branch -d your-change
+git push upstream --delete your-change
+```
+
+### Why not a fork
+
+Everyone working on this has write access to the canonical repository, so a
+fork adds a second place for branches to live without adding any control. A
+branch pushed to a fork also puts GitHub's "create pull request" prompt on the
+fork rather than on the repository that deploys, which is confusing.
+
+The `origin` mirror is harmless to keep as a personal backup. If you do keep
+it, remember GitHub never syncs a fork for you:
+
+```bash
+git push origin main
+```
+
 ## Rules that must not change
 
 - `trailingSlash: true` in `next.config.mjs` — every legacy WordPress URL
