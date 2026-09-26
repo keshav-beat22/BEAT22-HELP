@@ -18,7 +18,7 @@ import { NextResponse, type NextRequest } from 'next/server';
  * "Code generation from strings disallowed" and every route 500s. Filtering
  * happens in code below instead.
  */
-const ADMIN_PREFIXES = ['/keystatic', '/api/keystatic'];
+const ADMIN_PREFIXES = ['/keystatic', '/api/keystatic', '/admin'];
 
 function isAdmin(pathname: string) {
   return ADMIN_PREFIXES.some(

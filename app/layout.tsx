@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import JsonLd from '@/components/JsonLd';
 import SiteChrome from '@/components/SiteChrome';
+import { Analytics } from '@vercel/analytics/next';
 import { site } from '@/lib/site';
 import { graph, organisationSchema, websiteSchema } from '@/lib/seo';
 import { getPopulatedCategories } from '@/lib/posts';
@@ -90,6 +91,11 @@ export default function RootLayout({
         </main>
         <SiteChrome>
           <Footer />
+          {/* Inside SiteChrome so the admin does not spend page views from
+              the Hobby plan's 50,000/month, and so internal editing is not
+              mixed into the public traffic figures. Cookieless, so it needs
+              no consent banner. */}
+          <Analytics />
         </SiteChrome>
       </body>
     </html>
