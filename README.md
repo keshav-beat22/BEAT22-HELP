@@ -14,6 +14,8 @@ npm run lint     # eslint
 
 Node 20 LTS recommended.
 
+Live: <https://helpbeat22.vercel.app> — custom domain `help.beat22.com` pending DNS.
+
 ## Layout
 
 ```
