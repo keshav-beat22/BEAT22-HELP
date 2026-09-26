@@ -4,20 +4,18 @@ import { block } from '@keystatic/core/content-components';
 /**
  * Keystatic admin, served at /keystatic and aliased as /admin.
  *
- * Storage is the GitHub repo itself: saving in the admin commits to the
- * repository, so publishing is still a reviewable git change and there is
- * still no database.
+ * Storage is always the GitHub repo itself: saving in the admin commits to
+ * the repository, so publishing is a reviewable git change and there is still
+ * no database.
  *
- * GitHub storage needs three secrets. They only exist once the GitHub App has
- * been created, so fall back to local storage when they are absent — otherwise
- * `next build` fails outright and the whole site stops deploying just because
- * the CMS is not configured yet.
+ * There is deliberately no local-storage fallback. It looked safer, but it
+ * made the CMS impossible to set up — Keystatic only registers the
+ * /keystatic/setup wizard and the github/* API routes in GitHub mode, so the
+ * page that generates the secrets only existed once you already had them.
+ * GitHub mode also gates the editor behind a sign-in, which local mode does
+ * not. The build no longer needs the secrets; see the lazy handler in
+ * app/api/keystatic/[...params]/route.ts.
  */
-const gitHubAppConfigured = Boolean(
-  process.env.KEYSTATIC_GITHUB_CLIENT_ID &&
-    process.env.KEYSTATIC_GITHUB_CLIENT_SECRET &&
-    process.env.KEYSTATIC_SECRET,
-);
 
 /**
  * Scoped to the whole /images tree, not a dedicated uploads folder.
@@ -31,16 +29,13 @@ const IMAGE_DIR = 'public/images';
 const IMAGE_PATH = '/images/';
 
 export default config({
-  storage: gitHubAppConfigured
-    ? {
-        kind: 'github',
-        // The repository the admin commits to. Must match the repo the
-        // Keystatic GitHub App was installed on, and the repo Vercel deploys
-        // from — if these three disagree, saving in the admin silently writes
-        // somewhere nobody is watching.
-        repo: { owner: 'ashishIPM', name: 'BEAT22-HELP' },
-      }
-    : { kind: 'local' },
+  storage: {
+    kind: 'github',
+    // Must match the repo the Keystatic GitHub App is installed on, and the
+    // repo Vercel deploys from — if these disagree, saving in the admin
+    // writes somewhere nobody is watching.
+    repo: { owner: 'ashishIPM', name: 'BEAT22-HELP' },
+  },
 
   ui: {
     brand: { name: 'Beat22 Help Centre' },

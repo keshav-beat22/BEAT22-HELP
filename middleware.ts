@@ -43,14 +43,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url.toString(), 308);
   };
 
-  // The admin's API routes are ordinary Next route handlers and, under
-  // trailingSlash: true, are registered with the slash. Only the UI pages need
-  // it removed, for Keystatic's client router.
-  if (pathname.startsWith('/api/keystatic')) {
-    if (!pathname.endsWith('/')) return to(`${pathname}/`);
-    return NextResponse.next();
-  }
-
+  // Both the admin UI and its API want paths without a trailing slash:
+  // Keystatic matches routes on the exact pathname, so `github/login/` is not
+  // recognised and 404s, and the client router does the same for its own
+  // pages. Next's own redirect is off (skipTrailingSlashRedirect), so the
+  // slash is stripped here instead.
   if (isAdmin(pathname)) {
     if (pathname.length > 1 && pathname.endsWith('/')) {
       return to(pathname.replace(/\/+$/, ''));
