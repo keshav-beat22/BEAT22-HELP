@@ -63,11 +63,37 @@ components with their own layout and structured data — they are code, not
 content. Adding one is a developer task (see [Add a page](#add-a-page)).
 Articles, which is what almost all new content is, are fully covered.
 
+### Signing in
+
+Two steps, every time:
+
+1. **Access code** at `/admin` — a shared code held in `ADMIN_ACCESS_CODE`.
+   Without it nothing under `/admin` or `/keystatic` responds at all. Lasts
+   12 hours, then asks again.
+2. **Your own account** — identifies who you are, and is what actually
+   authorises publishing. Every save is a commit in your name.
+
+If the first screen says access is not configured, `ADMIN_ACCESS_CODE` is
+missing from the environment — see [SECURITY.md](SECURITY.md).
+
 ### First-time setup
 
-The admin needs a GitHub App. Visit **/keystatic/setup** on the deployed site
-once and follow the wizard — it creates the app and shows you four values to
-paste into Vercel → Settings → Environment Variables:
+The admin needs a GitHub App, created once by the setup wizard. The wizard
+only runs locally — Keystatic refuses to complete it anywhere else, because
+it writes secrets to a file:
+
+```bash
+npm run dev      # must be on port 3000
+```
+
+Open **http://localhost:3000/keystatic/setup**, leave the organisation field
+blank, and install the app on **this repository only**. GitHub redirects back
+and writes four values into `.env` (gitignored). Restart the dev server —
+`NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG` is compiled into the browser bundle,
+so a running server will not pick it up.
+
+Copy the same four into Vercel → Settings → Environment Variables, ticked for
+Production, Preview and Development:
 
 ```
 KEYSTATIC_GITHUB_CLIENT_ID
@@ -76,8 +102,25 @@ KEYSTATIC_SECRET
 NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG
 ```
 
-Redeploy and the admin is live. Until those are set the site still builds and
-serves normally — the admin just runs in local-only mode.
+Plus `ADMIN_ACCESS_CODE`, which the wizard does not generate — pick one with
+`openssl rand -base64 24`.
+
+Mark `KEYSTATIC_GITHUB_CLIENT_SECRET`, `KEYSTATIC_SECRET` and
+`ADMIN_ACCESS_CODE` as **Sensitive** in Vercel. The two `NEXT_PUBLIC_` ones
+must stay plain **Config**: that prefix compiles the value into the browser
+bundle, so Vercel will not let you mark them secret, and neither is one — the
+site URL and the app slug are both public.
+
+Redeploy and the admin is live. Until they are set the public site builds and
+serves normally; only `/api/keystatic/*` reports the misconfiguration.
+
+The wizard registers one OAuth callback per origin it knows about. To sign in
+from a new address later — the custom domain, say — add it to the GitHub App's
+callback list rather than running the wizard again:
+
+```
+https://help.beat22.com/api/keystatic/github/oauth/callback
+```
 
 Only people with write access to the GitHub repository can sign in, so
 removing someone's repo access removes their ability to publish.
@@ -149,6 +192,7 @@ excerpt: "…"                                 # shown on category cards
 categories: ["Content Management"]           # display names
 categorySlugs: ["content-management-2"]      # what actually routes
 tags: ["seller"]
+draft: false                                 # true hides it from the site
 ---
 ```
 
@@ -237,6 +281,38 @@ Three things matter every time:
 
 Keep files under about 300 KB. Resize before committing rather than relying on
 the browser to scale a 4000px screenshot down to 900px.
+
+---
+
+## Hide an article without deleting it
+
+Tick **Hidden** in the editor and save. The article stays in the repository
+exactly as it was, and disappears from everywhere a reader could reach it:
+
+| | Hidden article |
+|---|---|
+| Home page, category pages, `/buyers/`, `/sellers/`, `/blogs/` | not listed |
+| Search | not in the index |
+| `sitemap.xml` | not listed |
+| Previous/next links on neighbouring articles | skips over it |
+| Category counts | excludes it |
+| Its own URL | returns the 404 page |
+
+Untick to bring it back. The URL, the position in the date order and the
+category counts all return to exactly what they were — nothing is regenerated
+and no redirect is involved.
+
+The **Hidden** column in the article list shows `true`/`false`, and sorting by
+it groups every hidden article together.
+
+Use this rather than deleting whenever the article might come back — a feature
+being rebuilt, a seasonal promotion, a page that is temporarily wrong. Deleting
+loses the URL and its history.
+
+A caveat worth knowing: hiding a page that search engines have already indexed
+makes it start returning 404, and Google will eventually drop it. That is the
+right outcome for something genuinely withdrawn, but if you are only pausing
+something briefly, expect to ask for re-indexing when it comes back.
 
 ---
 

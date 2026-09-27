@@ -51,7 +51,7 @@ export default config({
       entryLayout: 'content',
       // The slugField renders its own column automatically; listing it again
       // produced an empty "Title". Only the extra columns belong here.
-      columns: ['date'],
+      columns: ['date', 'draft'],
 
       schema: {
         title: fields.slug({
@@ -66,6 +66,13 @@ export default config({
             description:
               'The last part of the address. Once published, do not change it — every inbound link depends on it.',
           },
+        }),
+
+        draft: fields.checkbox({
+          label: 'Hidden',
+          description:
+            'Take the article off the site without deleting it. It disappears from the home page, its category, search and the sitemap, and its URL starts returning "page not found". Untick to put it back exactly as it was.',
+          defaultValue: false,
         }),
 
         urlPath: fields.text({

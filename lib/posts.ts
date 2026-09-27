@@ -24,6 +24,8 @@ export interface Post {
   categories: string[];
   categorySlugs: string[];
   tags: string[];
+  /** Hidden in the admin: kept on disk, absent from every page and the sitemap. */
+  draft: boolean;
   /** Original post HTML, media paths already rewritten to /images/... */
   html: string;
 }
@@ -144,14 +146,21 @@ export function getAllPosts(): Post[] {
       categories: data.categories ?? namesForSlugs(categorySlugs),
       categorySlugs,
       tags: data.tags ?? [],
+      draft: data.draft === true,
       html: renderBody(file, content),
     } satisfies Post;
   });
 
   // Newest first, matching the WP_Query orderby=date order=DESC in the templates.
   posts.sort((a, b) => b.date.localeCompare(a.date));
-  cache = posts;
-  return posts;
+
+  // Hidden articles are dropped here rather than at each call site, because
+  // every list, the category counts, the search index, the sitemap and
+  // generateStaticParams all read through this one function. Dropping them
+  // from generateStaticParams is what makes the URL 404 while dynamicParams
+  // is false — the file stays on disk, so unticking the box restores it.
+  cache = posts.filter((p) => !p.draft);
+  return cache;
 }
 
 export function getPostByUrlPath(urlPath: string): Post | undefined {

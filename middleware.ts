@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { ADMIN_COOKIE, tokenIsValid } from '@/lib/admin-auth';
 
 /**
  * Trailing-slash policy, applied per path.
@@ -18,7 +19,13 @@ import { NextResponse, type NextRequest } from 'next/server';
  * "Code generation from strings disallowed" and every route 500s. Filtering
  * happens in code below instead.
  */
-const ADMIN_PREFIXES = ['/keystatic', '/api/keystatic', '/admin'];
+// '/api/admin' is listed so the unlock endpoint follows the admin
+// trailing-slash rule too. Without it the public rule appended a slash and
+// 308'd the sign-in POST away from its own handler.
+const ADMIN_PREFIXES = ['/keystatic', '/api/keystatic', '/admin', '/api/admin'];
+
+/** The gate itself, which obviously cannot sit behind the gate. */
+const UNLOCK_PATHS = ['/admin/unlock', '/api/admin/unlock'];
 
 function isAdmin(pathname: string) {
   return ADMIN_PREFIXES.some(
@@ -26,7 +33,13 @@ function isAdmin(pathname: string) {
   );
 }
 
-export function middleware(request: NextRequest) {
+function isUnlock(pathname: string) {
+  return UNLOCK_PATHS.some(
+    (p) => pathname === p || pathname.startsWith(`${p}/`),
+  );
+}
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Framework internals and anything with a file extension: leave alone.
@@ -52,6 +65,21 @@ export function middleware(request: NextRequest) {
     if (pathname.length > 1 && pathname.endsWith('/')) {
       return to(pathname.replace(/\/+$/, ''));
     }
+
+    if (isUnlock(pathname)) return NextResponse.next();
+
+    // Fails closed. An admin that quietly opened itself because a variable
+    // was missing would be the worst possible outcome of a config mistake,
+    // so an unset code locks everyone out and the gate page says why.
+    const code = process.env.ADMIN_ACCESS_CODE ?? '';
+    const token = request.cookies.get(ADMIN_COOKIE)?.value;
+    if (!(await tokenIsValid(token, code))) {
+      const url = new URL(request.url);
+      url.pathname = '/admin/unlock';
+      url.search = '';
+      return NextResponse.redirect(url.toString(), 307);
+    }
+
     return NextResponse.next();
   }
 
