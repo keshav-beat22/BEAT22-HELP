@@ -38,7 +38,9 @@ async function main() {
     .readdirSync(postsDir)
     .filter((f) => /\.(mdoc|md)$/.test(f))
     .map((f) => matter(fs.readFileSync(path.join(postsDir, f), 'utf8')).data)
-    .filter((d) => d.urlPath);
+    // Hidden articles are deliberately absent from the deployed site, so
+    // checking their URLs would fail the run for working as intended.
+    .filter((d) => d.urlPath && d.draft !== true);
 
   console.log(`Checking ${base}`);
   console.log(`Expecting ${posts.length} articles from the repo\n`);
