@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 /**
@@ -16,13 +17,22 @@ import { useEffect, useState } from 'react';
  * Keystatic's own button does — so nothing about the flow changes, only what
  * the reader sees.
  *
+ * Suppressed on the setup routes. Those exist precisely because there is no
+ * GitHub App yet, so covering them with a sign-in prompt is a deadlock: the
+ * wizard that creates the credentials sits behind a button that cannot work
+ * until the wizard has run.
+ *
  * Signed-in state comes from `keystatic-gh-access-token`. Keystatic sets that
  * without httpOnly on purpose, because its client calls the API with it, so
  * reading it here reveals nothing new. It is not a security check: the real
  * ones are the access-code cookie enforced in middleware and the repository
  * permissions enforced by the identity provider.
  */
+/** Keystatic routes that are reached before any identity exists. */
+const PRE_AUTH_ROUTES = ['/keystatic/setup', '/keystatic/created-github-app'];
+
 export default function AdminSignIn() {
+  const pathname = usePathname() ?? '';
   // null until the cookie has been read, so the overlay cannot flash over
   // the editor for somebody who is already signed in.
   const [signedOut, setSignedOut] = useState<boolean | null>(null);
@@ -36,7 +46,10 @@ export default function AdminSignIn() {
     return () => window.clearInterval(timer);
   }, []);
 
-  if (signedOut !== true) return null;
+  const isPreAuth = PRE_AUTH_ROUTES.some(
+    (r) => pathname === r || pathname.startsWith(`${r}/`),
+  );
+  if (isPreAuth || signedOut !== true) return null;
 
   return (
     <div className="gate gate--overlay">
