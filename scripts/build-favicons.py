@@ -10,16 +10,22 @@ WordPress's favicon cropper flattened a transparent logo onto black. On the
 white site header nobody noticed; in a browser tab the mark shows black bars
 straight across it.
 
-The black is removed by pushing each pixel toward white in proportion to how
-far it already is from the brand purple. The purple is saturated in blue
-(b ~= 255) and the matte is not, so the blue channel is a clean discriminator
-and anti-aliased edges blend smoothly instead of leaving a dark fringe:
+The matte is removed by turning it back into transparency, not by repainting
+it. The bars are negative space in the logo, so they must show whatever is
+behind them — repainting them white only trades a black bar on light chrome
+for a white bar on dark chrome.
 
-    new = c + (255 - c) * (1 - b/255)
+The brand purple is saturated in blue (b ~= 255) and the matte is not, so the
+blue channel says how much of each pixel is really glyph:
 
-Pure black becomes white, brand purple is untouched, and everything between
-lands on the line joining them. The area outside the glyph stays transparent,
-so the mark reads the same on light and dark browser chrome.
+    t = b / 255          1 = brand purple, 0 = pure matte
+    alpha = a * t
+    colour = c / t       un-premultiply, recovering the purple underneath
+
+Pure black becomes fully transparent, brand purple is untouched, and the
+anti-aliased pixels between become partly transparent purple — so they
+composite correctly over any background instead of leaving a dark or light
+fringe.
 
 Apple touch icons get an opaque tile: iOS ignores transparency and composites
 onto black itself, which is the bug this script exists to fix.
@@ -46,21 +52,27 @@ def strip_black_matte(img: Image.Image) -> Image.Image:
     img = img.convert('RGBA')
     px = img.load()
     w, h = img.size
-    changed = 0
+    cleared = faded = 0
     for y in range(h):
         for x in range(w):
             r, g, b, a = px[x, y]
             if a == 0 or b >= 250:
                 continue
-            k = 1 - b / 255
+            t = b / 255
+            new_a = round(a * t)
+            if new_a <= 2:
+                px[x, y] = (0, 0, 0, 0)
+                cleared += 1
+                continue
             px[x, y] = (
-                round(r + (255 - r) * k),
-                round(g + (255 - g) * k),
-                round(b + (255 - b) * k),
-                a,
+                min(255, round(r / t)),
+                min(255, round(g / t)),
+                min(255, round(b / t)),
+                new_a,
             )
-            changed += 1
-    print(f'  pixels de-matted       : {changed}')
+            faded += 1
+    print(f'  matte pixels cleared   : {cleared}')
+    print(f'  edge pixels softened   : {faded}')
     return img
 
 
