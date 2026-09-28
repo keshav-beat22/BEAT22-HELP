@@ -95,7 +95,11 @@ git push origin main
 ## Rules that must not change
 
 - `trailingSlash: true` in `next.config.mjs` — every legacy WordPress URL
-  depends on it.
+  depends on it, and so does every redirect in `content/redirects.json`.
+- Articles live at flat `/slug/`. WordPress served them at `/YYYY/MM/DD/slug/`;
+  those paths all 308 to the flat form and must keep doing so. Run
+  `python3 scripts/undate-urls.py --check` after any content import to confirm
+  nothing has reverted to a dated path.
 - `urlPath` in an article's frontmatter is the single source of truth for that
   article's URL. Changing it breaks inbound links; add a redirect to
   `content/redirects.json` instead.

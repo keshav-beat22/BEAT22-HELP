@@ -1,57 +1,272 @@
 [
   {
     "source": "/super-send-can-send-html-emails/",
-    "destination": "/2025/06/07/how-to-enable-negotiation-feature/",
+    "destination": "/how-to-enable-negotiation-feature/",
     "permanent": true
   },
   {
     "source": "/lorem-ipsum/",
-    "destination": "/2025/06/07/how-to-enroll-coupon-codes/",
+    "destination": "/how-to-enroll-coupon-codes/",
     "permanent": true
   },
   {
     "source": "/test-post/",
-    "destination": "/2025/06/15/how-to-delete-a-beat-from-your-beat22-studio/",
+    "destination": "/how-to-delete-a-beat-from-your-beat22-studio/",
     "permanent": true
   },
   {
     "source": "/ccaecat-cupidatat-non-proident-sunt-in-c/",
-    "destination": "/2025/06/19/can-i-edit-my-beat-after-uploading/",
+    "destination": "/can-i-edit-my-beat-after-uploading/",
     "permanent": true
   },
   {
     "source": "/of-de-finibus-bonor/",
-    "destination": "/2025/06/19/beat-upload-faqs/",
+    "destination": "/beat-upload-faqs/",
     "permanent": true
   },
   {
     "source": "/ipsum-passage-used-since-the-1500s/",
-    "destination": "/2025/06/19/how-to-upload-beats/",
+    "destination": "/how-to-upload-beats/",
     "permanent": true
   },
   {
     "source": "/can-i-edit-the-price-of-a-license/",
-    "destination": "/2025/06/30/can-i-edit-the-price-of-a-license-on-beat22/",
+    "destination": "/can-i-edit-the-price-of-a-license-on-beat22/",
     "permanent": true
   },
   {
     "source": "/how-to-purchase-a-beat-on-beat22/",
-    "destination": "/2025/07/01/how-to-buy-beats-on-beat22/",
+    "destination": "/how-to-buy-beats-on-beat22/",
     "permanent": true
   },
   {
     "source": "/%f0%9f%8f%a0-how-can-i-edit-my-billing-address-on-beat22/",
-    "destination": "/2025/07/01/how-can-i-edit-my-billing-address-on-beat22/",
+    "destination": "/how-can-i-edit-my-billing-address-on-beat22/",
     "permanent": true
   },
   {
     "source": "/beat22-soundkits-guide/",
-    "destination": "/2025/12/09/preparing-your-soundkits-for-upload/",
+    "destination": "/preparing-your-soundkits-for-upload/",
     "permanent": true
   },
   {
     "source": "/publishing-vs-master-rights-for-sample-creators/",
-    "destination": "/2025/12/09/publishing-vs-master-rights-for-sound-kit-creators/",
+    "destination": "/publishing-vs-master-rights-for-sound-kit-creators/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/07/how-to-enable-negotiation-feature/",
+    "destination": "/how-to-enable-negotiation-feature/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/07/how-to-enroll-coupon-codes/",
+    "destination": "/how-to-enroll-coupon-codes/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/15/how-to-delete-a-beat-from-your-beat22-studio/",
+    "destination": "/how-to-delete-a-beat-from-your-beat22-studio/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/19/beat-upload-faqs/",
+    "destination": "/beat-upload-faqs/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/19/can-i-edit-my-beat-after-uploading/",
+    "destination": "/can-i-edit-my-beat-after-uploading/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/19/how-to-upload-beats/",
+    "destination": "/how-to-upload-beats/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/can-i-edit-the-price-of-a-license-on-beat22/",
+    "destination": "/can-i-edit-the-price-of-a-license-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/can-you-sell-the-same-beat-twice/",
+    "destination": "/can-you-sell-the-same-beat-twice/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/do-i-have-to-remove-the-beat-when-i-sell-an-exclusive-license/",
+    "destination": "/do-i-have-to-remove-the-beat-when-i-sell-an-exclusive-license/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/how-can-i-accept-counter-or-reject-negotiations-on-beat22/",
+    "destination": "/how-can-i-accept-counter-or-reject-negotiations-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/how-can-i-archive-my-beats/",
+    "destination": "/how-can-i-archive-my-beats/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/how-can-i-change-my-display-picture/",
+    "destination": "/how-can-i-change-my-display-picture/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/how-can-i-change-my-studio-handle/",
+    "destination": "/how-can-i-change-my-studio-handle/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/how-can-i-change-my-studio-name/",
+    "destination": "/how-can-i-change-my-studio-name/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/how-do-i-change-my-payment-method-for-my-beat22-subscription/",
+    "destination": "/how-do-i-change-my-payment-method-for-my-beat22-subscription/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/how-do-i-get-paid-for-my-beat-sales-on-beat22/",
+    "destination": "/how-do-i-get-paid-for-my-beat-sales-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/how-do-i-upgrade-my-account-on-beat22/",
+    "destination": "/how-do-i-upgrade-my-account-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/how-is-a-license-generated-on-beat22/",
+    "destination": "/how-is-a-license-generated-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/how-sellers-can-make-money-by-selling-beats-on-beat22-com/",
+    "destination": "/how-sellers-can-make-money-by-selling-beats-on-beat22-com/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/how-to-disable-a-license-for-a-specific-beat/",
+    "destination": "/how-to-disable-a-license-for-a-specific-beat/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/how-to-unarchive-a-beat/",
+    "destination": "/how-to-unarchive-a-beat/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/why-didnt-i-receive-my-payment-after-a-sale-on-beat22/",
+    "destination": "/why-didnt-i-receive-my-payment-after-a-sale-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/01/how-can-i-change-my-password-on-beat22/",
+    "destination": "/how-can-i-change-my-password-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/01/how-can-i-change-my-profile-picture-on-beat22/",
+    "destination": "/how-can-i-change-my-profile-picture-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/01/how-can-i-edit-my-billing-address-on-beat22/",
+    "destination": "/how-can-i-edit-my-billing-address-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/01/how-can-i-negotiate-the-price-of-an-exclusive-beat/",
+    "destination": "/how-can-i-negotiate-the-price-of-an-exclusive-beat/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/01/how-do-i-share-a-beat-on-beat22/",
+    "destination": "/how-do-i-share-a-beat-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/01/how-to-buy-beats-on-beat22/",
+    "destination": "/how-to-buy-beats-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/01/how-to-download-a-free-mp3-beat-on-beat22/",
+    "destination": "/how-to-download-a-free-mp3-beat-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/01/what-can-i-do-with-a-free-download-on-beat22/",
+    "destination": "/what-can-i-do-with-a-free-download-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/01/what-payment-methods-can-i-use-to-checkout-on-beat22/",
+    "destination": "/what-payment-methods-can-i-use-to-checkout-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/01/where-can-i-find-my-purchased-orders-on-beat22/",
+    "destination": "/where-can-i-find-my-purchased-orders-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/01/why-did-my-purchased-file-come-with-a-voice-tag/",
+    "destination": "/why-did-my-purchased-file-come-with-a-voice-tag/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/01/why-havent-i-received-my-files-after-purchase/",
+    "destination": "/why-havent-i-received-my-files-after-purchase/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/07/how-can-i-apply-a-coupon-code-on-my-purchase/",
+    "destination": "/how-can-i-apply-a-coupon-code-on-my-purchase/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/07/07/how-can-i-download-my-purchased-beats/",
+    "destination": "/how-can-i-download-my-purchased-beats/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/09/08/how-to-set-up-your-seller-account-on-beat22/",
+    "destination": "/how-to-set-up-your-seller-account-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/11/05/how-to-verify-your-mobile-number-and-aadhaar-on-beat22/",
+    "destination": "/how-to-verify-your-mobile-number-and-aadhaar-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/12/09/how-to-upload-your-sound-kits-on-beat22/",
+    "destination": "/how-to-upload-your-sound-kits-on-beat22/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/12/09/preparing-your-soundkits-for-upload/",
+    "destination": "/preparing-your-soundkits-for-upload/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/12/09/publishing-vs-master-rights-for-sound-kit-creators/",
+    "destination": "/publishing-vs-master-rights-for-sound-kit-creators/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/12/19/beat22-soundkits-credits-system-complete-guide/",
+    "destination": "/beat22-soundkits-credits-system-complete-guide/",
+    "permanent": true
+  },
+  {
+    "source": "/2025/06/30/can-people-who-purchased-a-non-exclusive-license-still-use-the-beat-after-the-exclusive-rights-are-sold/",
+    "destination": "/can-people-who-purchased-a-non-exclusive-license-still-use-the-beat-after-the-exclusive-rights-are-sold/",
     "permanent": true
   }
 ]

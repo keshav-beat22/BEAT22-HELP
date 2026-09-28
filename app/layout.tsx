@@ -31,8 +31,14 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: site.favicon,
-    apple: site.appleIcon,
+    // The .ico is listed first and is what Google's search-result favicon
+    // crawler picks up; the PNGs are what browsers actually render.
+    icon: [
+      { url: site.faviconIco, sizes: '16x16 32x32 48x48' },
+      { url: site.faviconSmall, type: 'image/png', sizes: '32x32' },
+      { url: site.favicon, type: 'image/png', sizes: '192x192' },
+    ],
+    apple: [{ url: site.appleIcon, sizes: '180x180' }],
   },
   alternates: { canonical: `${site.url}/` },
   openGraph: {
