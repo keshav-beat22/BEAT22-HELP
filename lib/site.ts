@@ -56,8 +56,13 @@ export const site = {
   /** Support contact surfaced in the Organization schema. */
   supportWhatsApp: 'https://wa.me/919872066692',
 
-  favicon: '/images/2025/07/cropped-Beat22-Logo-ICO-25-scaled-1-192x192.png',
-  appleIcon: '/images/2025/07/cropped-Beat22-Logo-ICO-25-scaled-1-180x180.png',
+  // Rebuilt by scripts/build-favicons.py. The WordPress originals had a black
+  // matte baked in where the B's bars should be negative space, which showed
+  // as black bars across the icon in any dark browser chrome.
+  favicon: '/images/brand/favicon-192.png',
+  faviconSmall: '/images/brand/favicon-32.png',
+  faviconIco: '/favicon.ico',
+  appleIcon: '/images/brand/apple-touch-icon.png',
 
   // Astra header-html-2: the only item in the header's right zone.
   headerCta: {

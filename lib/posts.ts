@@ -105,13 +105,18 @@ function namesForSlugs(slugs: string[]): string[] {
  * Articles authored in the admin have no `urlPath` to type, so derive the
  * same /YYYY/MM/DD/slug/ shape WordPress used from the date and slug.
  */
-function deriveUrlPath(date: string, slug: string): string {
-  // Accepts both "2026-09-24" and "2026-09-24 09:00:00".
-  const d = new Date(`${date.trim().replace(' ', 'T')}Z`);
-  if (Number.isNaN(d.getTime()) || !slug) return '';
-  const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
-  const dd = String(d.getUTCDate()).padStart(2, '0');
-  return `/${d.getUTCFullYear()}/${mm}/${dd}/${slug}/`;
+/**
+ * Flat `/slug/`, not WordPress's dated permalink.
+ *
+ * Help articles are evergreen: a date in the address made every result look
+ * stale and meant re-dating an article changed its URL. The dated paths all
+ * 308 to the flat ones via content/redirects.json, so nothing was orphaned.
+ * `date` is still taken so the signature is stable and the argument documents
+ * that ordering comes from frontmatter, not from the URL.
+ */
+function deriveUrlPath(_date: string, slug: string): string {
+  if (!slug) return '';
+  return `/${slug}/`;
 }
 
 export function getAllPosts(): Post[] {
@@ -255,8 +260,10 @@ export function getPopulatedCategories(): Category[] {
  * can reproduce the exact WordPress permalink structure.
  */
 export function urlPathToParams(urlPath: string) {
-  const [year, month, day, slug] = urlPath.replace(/^\/|\/$/g, '').split('/');
-  return { year, month, day, slug };
+  const parts = urlPath.replace(/^\/|\/$/g, '').split('/');
+  // Tolerates a legacy dated path as well as the flat form, so a stray
+  // /YYYY/MM/DD/slug/ still resolves to the right slug.
+  return { slug: parts[parts.length - 1] };
 }
 
 function normalise(p: string): string {

@@ -26,15 +26,12 @@ import {
 } from '@/lib/seo';
 
 interface Params {
-  year: string;
-  month: string;
-  day: string;
   slug: string;
 }
 
 /**
- * Reproduces every historical permalink, e.g.
- * /2025/06/07/how-to-enable-negotiation-feature/
+ * One flat path per article, e.g. /how-to-enable-negotiation-feature/.
+ * The old dated permalinks 308 here via content/redirects.json.
  */
 export function generateStaticParams(): Params[] {
   return getAllPosts().map((p) => urlPathToParams(p.urlPath));
@@ -42,8 +39,8 @@ export function generateStaticParams(): Params[] {
 
 export const dynamicParams = false;
 
-function find({ year, month, day, slug }: Params) {
-  return getPostByUrlPath(`/${year}/${month}/${day}/${slug}/`);
+function find({ slug }: Params) {
+  return getPostByUrlPath(`/${slug}/`);
 }
 
 export async function generateMetadata({
