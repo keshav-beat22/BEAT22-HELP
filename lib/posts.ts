@@ -64,12 +64,17 @@ function renderBody(file: string, raw: string): string {
  */
 function toDateString(value: unknown): string {
   if (!value) return '';
+
   if (value instanceof Date) {
-    return Number.isNaN(value.getTime())
-      ? ''
-      : value.toISOString().slice(0, 19).replace('T', ' ');
+    return Number.isNaN(value.getTime()) ? '' : value.toISOString().slice(0, 19);
   }
-  return String(value);
+
+  const raw = String(value).trim();
+  const m = /^(\d{4}-\d{2}-\d{2})(?:[ T](\d{2}:\d{2}(?::\d{2})?))?/.exec(raw);
+  // Anything unrecognised is returned untouched, so a malformed date surfaces
+  // as itself rather than as an empty string.
+  if (!m?.[1]) return raw;
+  return m[2] ? `${m[1]}T${m[2]}` : m[1];
 }
 
 /**
